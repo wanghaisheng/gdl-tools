@@ -11,6 +11,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Date;
 
 /**
  * @author iago.corbal
@@ -22,33 +23,33 @@ public class SQLGenericGuideDAO implements GenericGuideDAO {
     private DataSource dataSource;
 
     public SQLGenericGuideDAO() throws InternalErrorException {
-	dao = SQLGuideFactory.getDAO();
-	dataSource = DataSourceLocator.getDataSource(CDSGlobalNames.CDSS_DATA_SOURCE);
+        dao = SQLGuideFactory.getDAO();
+        dataSource = DataSourceLocator.getDataSource(CDSGlobalNames.CDSS_DATA_SOURCE);
     }
 
     public GuideDTO searchByGuideId(String idGuide)
-	    throws InternalErrorException, GuideNotFoundException {
-	Connection conexion = null;
-	try {
-	    conexion = dataSource.getConnection();
-	    return dao.searchByGuideId(conexion, idGuide);
-	} catch (SQLException e) {
-	    throw new InternalErrorException(e);
-	} finally {
-	    GeneralOperations.closeConnection(conexion);
-	}
+            throws InternalErrorException, GuideNotFoundException {
+        Connection conexion = null;
+        try {
+            conexion = dataSource.getConnection();
+            return dao.searchByGuideId(conexion, idGuide);
+        } catch (SQLException e) {
+            throw new InternalErrorException(e);
+        } finally {
+            GeneralOperations.closeConnection(conexion);
+        }
     }
 
     public Collection<GuideDTO> searchAll() throws InternalErrorException {
-	Connection conexion = null;
-	try {
-	    conexion = dataSource.getConnection();
-	    return dao.searchAll(conexion);
-	} catch (SQLException e) {
-	    throw new InternalErrorException(e);
-	} finally {
-	    GeneralOperations.closeConnection(conexion);
-	}
+        Connection conexion = null;
+        try {
+            conexion = dataSource.getConnection();
+            return dao.searchAll(conexion);
+        } catch (SQLException e) {
+            throw new InternalErrorException(e);
+        } finally {
+            GeneralOperations.closeConnection(conexion);
+        }
     }
 
     @Override
@@ -65,42 +66,55 @@ public class SQLGenericGuideDAO implements GenericGuideDAO {
     }
 
     public GuideDTO add(GuideDTO GuideDTO)
-	    throws InternalErrorException {
-	Connection conexion = null;
-	try {
-	    conexion = dataSource.getConnection();
-	    return dao.insert(conexion,GuideDTO);
-	} catch (SQLException e) {
-	    throw new InternalErrorException(e);
-	} finally {
-	    GeneralOperations.closeConnection(conexion);
-	}
+            throws InternalErrorException {
+        Connection conexion = null;
+        try {
+            conexion = dataSource.getConnection();
+            return dao.insert(conexion,GuideDTO);
+        } catch (SQLException e) {
+            throw new InternalErrorException(e);
+        } finally {
+            GeneralOperations.closeConnection(conexion);
+        }
     }
 
     public void update(GuideDTO GuideDTO)
-	    throws InternalErrorException, GuideNotFoundException {
-	Connection conexion = null;
-	try {
-	    conexion = dataSource.getConnection();
-	    dao.update(conexion,GuideDTO);
-	} catch (SQLException e) {
-	    throw new InternalErrorException(e);
-	} finally {
-	    GeneralOperations.closeConnection(conexion);
-	}
+            throws InternalErrorException, GuideNotFoundException {
+        Connection conexion = null;
+        try {
+            conexion = dataSource.getConnection();
+            dao.update(conexion,GuideDTO);
+        } catch (SQLException e) {
+            throw new InternalErrorException(e);
+        } finally {
+            GeneralOperations.closeConnection(conexion);
+        }
     }
 
     public void remove(String idGuide)
-	    throws InternalErrorException, GuideNotFoundException {
-	Connection conexion = null;
-	try {
-	    conexion = dataSource.getConnection();
-	    dao.remove(conexion,idGuide);
-	} catch (SQLException e) {
-	    throw new InternalErrorException(e);
-	} finally {
-	    GeneralOperations.closeConnection(conexion);
-	}
+            throws InternalErrorException, GuideNotFoundException {
+        Connection conexion = null;
+        try {
+            conexion = dataSource.getConnection();
+            dao.remove(conexion,idGuide);
+        } catch (SQLException e) {
+            throw new InternalErrorException(e);
+        } finally {
+            GeneralOperations.closeConnection(conexion);
+        }
+    }
+
+    @Override
+    public Date getLastUpdateDate() throws InternalErrorException {
+        Connection conexion = null;
+        try {
+            conexion = dataSource.getConnection();
+            return dao.getLastUpdateDate(conexion);
+        } catch (SQLException e) {
+            throw new InternalErrorException(e);
+        } finally {
+            GeneralOperations.closeConnection(conexion);
+        }
     }
 }
 /*

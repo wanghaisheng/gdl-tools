@@ -199,7 +199,8 @@ public class GDLEditor {
                             gdlGuide,
                             IOUtils.getBytes(guide),
                             compiledGuide,
-                            true);
+                            true,
+                            Calendar.getInstance().getTime());
             FormGeneratorController formGenerator =
                     new FormGeneratorController(guideDTO, controller.getCurrentGuideLanguageCode());
             Date date = UserConfigurationManager.getCustomDate();
@@ -1085,7 +1086,8 @@ public class GDLEditor {
                                 guideSource,
                                 IOUtils.getBytes(guide),
                                 compiledGuide,
-                                true);
+                                true,
+                                Calendar.getInstance().getTime());
                         ObjectOutputStream output = new ObjectOutputStream(
                                 new BufferedOutputStream(new FileOutputStream(
                                         guideFile)));

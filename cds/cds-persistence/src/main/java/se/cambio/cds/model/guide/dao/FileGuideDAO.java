@@ -14,7 +14,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 
 public class FileGuideDAO implements GenericGuideDAO{
 
@@ -28,7 +30,7 @@ public class FileGuideDAO implements GenericGuideDAO{
                 UnicodeBOMInputStream ubis = new UnicodeBOMInputStream(fis);
                 ubis.skipBOM();
                 String guideSrc = IOUtils.toString(ubis, "UTF-8");
-                return new GuideDTO(idGuide, guideSrc, null, null, true);
+                return new GuideDTO(idGuide, guideSrc, null, null, true, Calendar.getInstance().getTime());
             }
             throw new GuideNotFoundException(idGuide);
         }catch(IOException e){
@@ -53,7 +55,7 @@ public class FileGuideDAO implements GenericGuideDAO{
                         ubis.skipBOM();
                         String idGuide = fileName.substring(0,fileName.length()-4);
                         String guideSrc = IOUtils.toString(ubis, "UTF-8");
-                        guides.add(new GuideDTO(idGuide, guideSrc, null,  null, true));
+                        guides.add(new GuideDTO(idGuide, guideSrc, null,  null, true, Calendar.getInstance().getTime()));
                     }catch(Exception e){
                         ExceptionHandler.handle(e);
                     }
@@ -79,6 +81,11 @@ public class FileGuideDAO implements GenericGuideDAO{
 
     public void remove(String idGuide) throws InternalErrorException,
             GuideNotFoundException {
+    }
+
+    public Date getLastUpdateDate()
+            throws InternalErrorException{
+        return null;
     }
 }
 /*

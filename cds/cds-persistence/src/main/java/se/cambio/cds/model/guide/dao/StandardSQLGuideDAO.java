@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 /**
  * @author iago.corbal
@@ -26,7 +27,7 @@ public class StandardSQLGuideDAO implements SQLGuideDAO {
 
         try {
 	    /* Create "preparedStatement". */
-            String queryString = "SELECT guideSrc, guideObject, compiledGuide, active FROM cds_guide WHERE guideid = ?";
+            String queryString = "SELECT guideSrc, guideObject, compiledGuide, active, lastUpdate FROM cds_guide WHERE guideid = ?";
             preparedStatement = connection.prepareStatement(queryString);
 
 	    /* Fill "preparedStatement". */
@@ -46,8 +47,9 @@ public class StandardSQLGuideDAO implements SQLGuideDAO {
             byte[] guide = resultSet.getBytes(i++);
             byte[] compiledGuide = resultSet.getBytes(i++);
             boolean active = DBConversion.toBoolean(resultSet.getShort(i++));
+            Date lastUpdate = DBConversion.toDate(resultSet.getTimestamp(i++));
 	    /* Return the value object. */
-            return new GuideDTO(guideId, guideSrc, guide, compiledGuide, active);
+            return new GuideDTO(guideId, guideSrc, guide, compiledGuide, active, lastUpdate);
         } catch (SQLException e) {
             throw new InternalErrorException(e);
         } finally {
@@ -65,7 +67,7 @@ public class StandardSQLGuideDAO implements SQLGuideDAO {
 
 	    /* Create "preparedStatement". */
             String queryString =
-                    "SELECT guideid, guideSrc, guideObject, compiledGuide, active FROM cds_guide";
+                    "SELECT guideid, guideSrc, guideObject, compiledGuide, active, lastUpdate FROM cds_guide";
             preparedStatement = connection.prepareStatement(queryString);
 
 	    /* Execute query. */
@@ -83,8 +85,9 @@ public class StandardSQLGuideDAO implements SQLGuideDAO {
                 byte[] guide = resultSet.getBytes(i++);
                 byte[] compiledGuide = resultSet.getBytes(i++);
                 boolean active = DBConversion.toBoolean(resultSet.getShort(i++));
+                Date lastUpdate = DBConversion.toDate(resultSet.getTimestamp(i++));
                 GuideDTO guideDTO =
-                        new GuideDTO(guideId, guideSrc, guide, compiledGuide, active);
+                        new GuideDTO(guideId, guideSrc, guide, compiledGuide, active, lastUpdate);
                 guideDTOs.add(guideDTO);
             } while (resultSet.next());
 
@@ -107,7 +110,7 @@ public class StandardSQLGuideDAO implements SQLGuideDAO {
 
 	    /* Create "preparedStatement". */
             String queryString =
-                    "SELECT guideid, guideSrc, active FROM cds_guide";
+                    "SELECT guideid, guideSrc, active, lastUpdate FROM cds_guide";
             preparedStatement = connection.prepareStatement(queryString);
 
 	    /* Execute query. */
@@ -123,8 +126,10 @@ public class StandardSQLGuideDAO implements SQLGuideDAO {
                 String guideId = resultSet.getString(i++);
                 String guideSrc = resultSet.getString(i++);
                 boolean active = DBConversion.toBoolean(resultSet.getShort(i++));
+                Date lastUpdate = DBConversion.toDate(resultSet.getTimestamp(i++));
+
                 GuideDTO guideDTO =
-                        new GuideDTO(guideId, guideSrc, null, null, active);
+                        new GuideDTO(guideId, guideSrc, null, null, active, lastUpdate);
                 guideDTOs.add(guideDTO);
             } while (resultSet.next());
 
@@ -145,7 +150,7 @@ public class StandardSQLGuideDAO implements SQLGuideDAO {
 
         try {
 	    /* Create "preparedStatement". */
-            String queryString = "INSERT INTO cds_guide (guideid, guideSrc, guideObject, compiledGuide, active) VALUES (?, ?, ?, ?, ?)";
+            String queryString = "INSERT INTO cds_guide (guideid, guideSrc, guideObject, compiledGuide, active, lastUpdate) VALUES (?, ?, ?, ?, ?, ?)";
             preparedStatement = connection.prepareStatement(queryString);
 
 	    /* Fill "preparedStatement". */
@@ -155,7 +160,7 @@ public class StandardSQLGuideDAO implements SQLGuideDAO {
             preparedStatement.setBytes(i++, guideDTO.getGuideObject());
             preparedStatement.setBytes(i++, guideDTO.getCompiledGuide());
             preparedStatement.setShort(i++, DBConversion.toShort(guideDTO.isActive()));
-	    
+            preparedStatement.setTimestamp(i++, DBConversion.toTimestamp(guideDTO.getLastUpdate()));
 	    /* Execute query. */
             int insertedRows = preparedStatement.executeUpdate();
 
@@ -182,7 +187,7 @@ public class StandardSQLGuideDAO implements SQLGuideDAO {
 
         try {
 	    /* Create "preparedStatement". */
-            String queryString = "UPDATE cds_guide SET guideSrc = ?, guideObject = ?, compiledGuide = ?, active = ? WHERE guideid = ?";
+            String queryString = "UPDATE cds_guide SET guideSrc = ?, guideObject = ?, compiledGuide = ?, active = ?, lastUpdate = ? WHERE guideid = ?";
             preparedStatement = connection.prepareStatement(queryString);
 
 	    /* Fill "preparedStatement". */
@@ -191,6 +196,7 @@ public class StandardSQLGuideDAO implements SQLGuideDAO {
             preparedStatement.setBytes(i++, guideDTO.getGuideObject());
             preparedStatement.setBytes(i++, guideDTO.getCompiledGuide());
             preparedStatement.setShort(i++, DBConversion.toShort(guideDTO.isActive()));
+            preparedStatement.setTimestamp(i++, DBConversion.toTimestamp(guideDTO.getLastUpdate()));
             preparedStatement.setString(i++, guideDTO.getIdGuide());
 
 	    /* Execute query. */
@@ -230,6 +236,31 @@ public class StandardSQLGuideDAO implements SQLGuideDAO {
             int deletedRows = preparedStatement.executeUpdate();
             if (deletedRows == 0) {
                 throw new GuideNotFoundException(guideId);
+            }
+        } catch (SQLException e) {
+            throw new InternalErrorException(e);
+        } finally {
+            GeneralOperations.closeResultSet(resultSet);
+            GeneralOperations.closeStatement(preparedStatement);
+        }
+    }
+
+    @Override
+    public Date getLastUpdateDate(Connection connection) throws InternalErrorException {
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+	    /* Create "preparedStatement". */
+            String queryString = "SELECT lastUpdate FROM cds_guide ORDER BY lastUpdate DESC LIMIT 1";
+            preparedStatement = connection.prepareStatement(queryString);
+
+	    /* Execute query. */
+            resultSet = preparedStatement.executeQuery();
+            if (!resultSet.next()) {
+                return null;
+            }else {
+                return DBConversion.toDate(resultSet.getTimestamp(1));
             }
         } catch (SQLException e) {
             throw new InternalErrorException(e);

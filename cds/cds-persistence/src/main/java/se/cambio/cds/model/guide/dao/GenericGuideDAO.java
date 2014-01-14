@@ -5,6 +5,7 @@ import se.cambio.cds.util.exceptions.GuideNotFoundException;
 import se.cambio.openehr.util.exceptions.InternalErrorException;
 
 import java.util.Collection;
+import java.util.Date;
 
 /**
  * @author iago.corbal
@@ -28,6 +29,10 @@ public interface GenericGuideDAO {
 
 	public void remove(String idGuide)
 	throws InternalErrorException, GuideNotFoundException;
+
+    public Date getLastUpdateDate()
+            throws InternalErrorException;
+
 }
 /*
  *  ***** BEGIN LICENSE BLOCK *****

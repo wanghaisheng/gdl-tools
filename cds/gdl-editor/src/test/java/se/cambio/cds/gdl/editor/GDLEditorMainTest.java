@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 
 
@@ -81,7 +82,8 @@ public class GDLEditorMainTest extends TestCase {
                 guideStr,
                 IOUtils.getBytes(guide),
                 compiledGuide,
-                true);
+                true,
+                Calendar.getInstance().getTime());
     }
 
     public static String createDroolsGuide(Guide guide) throws InternalErrorException {

@@ -43,9 +43,29 @@ public class DBConversion {
 	public static Date toDate(Calendar fecha){
 		if (fecha==null) return null;
 		return new Date(fecha.getTime().getTime());
-	}	
-	
-	public static Calendar toCalendar(Date fecha){
+	}
+
+    public static java.util.Date toDate(java.sql.Date date){
+        if (date==null) return null;
+        return new java.util.Date(date.getTime());
+    }
+
+    public static java.sql.Date toSQLDate(java.util.Date date){
+        if (date==null) return null;
+        return new java.sql.Date(date.getTime());
+    }
+
+    public static java.util.Date toDate(Timestamp timestamp){
+        if (timestamp==null) return null;
+        return new java.util.Date(timestamp.getTime());
+    }
+
+     public static Timestamp toTimestamp(java.util.Date date){
+        if (date==null) return null;
+        return new Timestamp(date.getTime());
+    }
+
+    public static Calendar toCalendar(Date fecha){
 		if (fecha==null) return null;
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(fecha);

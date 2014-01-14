@@ -1,6 +1,7 @@
 package se.cambio.cds.model.guide.dto;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class GuideDTO implements Serializable{
 
@@ -10,14 +11,16 @@ public class GuideDTO implements Serializable{
     private byte[] guideObject;
     private byte[] compiledGuide;
     private boolean active;
+    private Date lastUpdate;
 
-    public GuideDTO(String idGuide, String guideSrc, byte[] guideObject, byte[] compiledGuide, boolean active) {
+    public GuideDTO(String idGuide, String guideSrc, byte[] guideObject, byte[] compiledGuide, boolean active, Date lastUpdate) {
         super();
         this.idGuide = idGuide;
         this.guideSrc = guideSrc;
         this.guideObject = guideObject;
         this.compiledGuide = compiledGuide;
         this.active = active;
+        this.lastUpdate = lastUpdate;
     }
     public String getIdGuide() {
         return idGuide;
@@ -48,6 +51,14 @@ public class GuideDTO implements Serializable{
     }
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
     /*
     public int hashCode() {

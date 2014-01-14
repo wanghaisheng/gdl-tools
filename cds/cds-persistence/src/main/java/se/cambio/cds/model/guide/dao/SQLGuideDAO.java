@@ -6,6 +6,7 @@ import se.cambio.openehr.util.exceptions.InternalErrorException;
 
 import java.sql.Connection;
 import java.util.Collection;
+import java.util.Date;
 
 /**
  * @author iago.corbal
@@ -29,6 +30,9 @@ public interface SQLGuideDAO {
     
     public void remove(Connection connection, String idGuide)
 	    throws InternalErrorException, GuideNotFoundException;
+
+    public Date getLastUpdateDate(Connection connection)
+            throws InternalErrorException;
 }
 /*
  *  ***** BEGIN LICENSE BLOCK *****

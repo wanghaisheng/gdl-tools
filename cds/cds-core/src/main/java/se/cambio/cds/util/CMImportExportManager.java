@@ -16,6 +16,7 @@ import se.cambio.openehr.util.exceptions.InternalErrorException;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -211,7 +212,7 @@ public class CMImportExportManager {
                 }else if (entry.getName().startsWith(GUIDELINES_FOLDER_NAME) && entry.getName().endsWith(GUIDELINES_POSTFIX)){
                     String src = IOUtils.toString(zis,"UTF-8");
                     String guideId = entry.getName().substring(GUIDELINES_FOLDER_NAME.length()+1, entry.getName().length()-GUIDELINES_POSTFIX.length());
-                    guideSourceDTOs.add(new GuideDTO(guideId, src, null, null, false));
+                    guideSourceDTOs.add(new GuideDTO(guideId, src, null, null, false, Calendar.getInstance().getTime()));
                 }else if (entry.getName().startsWith(ARCHETYPE_DTO_PREFIX) && entry.getName().endsWith(DTO_POSTFIX)){
                     ArchetypeDTO archetypeDTO = (ArchetypeDTO)IOUtils.getObject(IOUtils.toByteArray(zis));
                     archetypeDTOs.add(archetypeDTO);

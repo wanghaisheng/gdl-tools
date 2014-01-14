@@ -107,7 +107,7 @@ public class GuideUtil {
                             String idElement =
                                     archetypeBinding.getArchetypeId()+path;
                             DataValue dv = new CurrentTimeExpressionDataValue(r, attribute);
-                            PredicateGeneratedElementInstance predicateGeneratedElementInstance = new PredicateGeneratedElementInstance(
+                            new PredicateGeneratedElementInstance(
                                     idElement,
                                     dv,
                                     ar,

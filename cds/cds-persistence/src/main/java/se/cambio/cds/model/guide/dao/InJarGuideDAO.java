@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 public class InJarGuideDAO implements GenericGuideDAO{
 
@@ -105,6 +106,11 @@ public class InJarGuideDAO implements GenericGuideDAO{
 
     public void remove(String idGuide) throws InternalErrorException,
     GuideNotFoundException {
+    }
+
+    public Date getLastUpdateDate()
+            throws InternalErrorException{
+        return null;
     }
 }
 /*

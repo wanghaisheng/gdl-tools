@@ -5,6 +5,7 @@ CREATE TABLE cds_guide
     guideObject BYTEA NOT NULL,
     compiledguide BYTEA NOT NULL,
     active SMALLINT NOT NULL,
+    lastUpdate TIMESTAMP WITHOUT TIME ZONE,
     PRIMARY KEY (guideid)
 )  extent size 2048 next size 2048 lock mode row;
 revoke all on cds_guide from "public";

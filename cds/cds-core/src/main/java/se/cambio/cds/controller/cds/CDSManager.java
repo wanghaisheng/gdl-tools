@@ -5,6 +5,7 @@ import se.cambio.cds.controller.CDSSessionManager;
 import se.cambio.cds.controller.guide.GuideManager;
 import se.cambio.cds.gdl.model.Guide;
 import se.cambio.cds.model.facade.execution.vo.GeneratedArchetypeReference;
+import se.cambio.cds.model.facade.execution.vo.GeneratedElementInstance;
 import se.cambio.cds.model.facade.execution.vo.PredicateGeneratedElementInstance;
 import se.cambio.cds.model.facade.kb.delegate.KBFacadeDelegate;
 import se.cambio.cds.model.facade.kb.delegate.KBFacadeDelegateFactory;
@@ -114,7 +115,14 @@ public class CDSManager {
                 }
                 for (ElementInstance elementInstance: elementInstancesToRemove){
                      preAR.getElementInstancesMap().remove(elementInstance.getId());
-                    new ElementInstance(elementInstance.getId(), null, preAR, null, null);   //We add the simple reference
+                    String gtCode = null;
+                    String guideId = null;
+                    if (elementInstance instanceof GeneratedElementInstance){
+                        GeneratedElementInstance gei = (GeneratedElementInstance)elementInstance;
+                        gtCode = gei.getGtCode();
+                        guideId = gei.getGuideId();
+                    }
+                    new GeneratedElementInstance(elementInstance.getId(), null, preAR, null, null, guideId, gtCode);   //We add the simple reference
                 }
                 //TODO Merge additional missing references from EHR and ANY domain
             }
