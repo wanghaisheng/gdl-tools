@@ -2,10 +2,7 @@ package se.cambio.cds.util;
 
 import org.apache.log4j.Logger;
 import org.openehr.rm.datatypes.basic.DataValue;
-import org.openehr.rm.datatypes.quantity.DvCount;
-import org.openehr.rm.datatypes.quantity.DvOrdinal;
-import org.openehr.rm.datatypes.quantity.DvProportion;
-import org.openehr.rm.datatypes.quantity.DvQuantity;
+import org.openehr.rm.datatypes.quantity.*;
 import org.openehr.rm.datatypes.quantity.datetime.DvDateTime;
 import org.openehr.rm.datatypes.quantity.datetime.DvDuration;
 import org.openehr.rm.datatypes.quantity.datetime.DvTemporal;
@@ -145,7 +142,7 @@ public class DVUtil {
         }
     }
 
-    public boolean isNotSubClassOf(boolean inPredicate, ElementInstance ei, DataValue... dataValues){
+    public static boolean isNotSubClassOf(boolean inPredicate, ElementInstance ei, DataValue... dataValues){
         if (ei instanceof PredicateGeneratedElementInstance){
             return true;
         }else{
@@ -241,6 +238,25 @@ public class DVUtil {
         }else{
             return new ConstantExpression(dataValueStr);
         }
+    }
+
+    public static boolean checkMaxMin(DataValue predicateDV, DataValue dv, String opSymbol) throws InternalErrorException{
+        if (predicateDV instanceof DvOrdered && dv instanceof DvOrdered){
+            int comp = ((DvOrdered) predicateDV).compareTo((DvOrdered)dv);
+            if (OperatorKind.MAX.getSymbol().equals(opSymbol)){
+                return comp<0;
+            }else if (OperatorKind.MIN.getSymbol().equals(opSymbol)){
+                return comp>0;
+            }else{
+                throw new InternalErrorException(new Exception("Operator for predicate '"+opSymbol+"' is not valid."));
+            }
+        }else{
+            return false;
+        }
+    }
+
+    public static boolean test2(DataValue dv){
+        return true;
     }
 }
 /*

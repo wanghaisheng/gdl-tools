@@ -71,8 +71,9 @@ public class DVHierarchyCodedTextPanel extends DVGenericPanel{
 
     private static void addCodedText(SelectableNode<CodedTextVO> rootNode, CodedTextVO codedTextVO, Map<CodedTextVO, SelectableNode<CodedTextVO>> nodeMap, boolean multipleSelection){
         if (!nodeMap.containsKey(codedTextVO)){
+            String codedTextName = codedTextVO.getName()+(codedTextVO.getCode()!=null?" ("+codedTextVO.getCode()+")":"");
             SelectableNodeWithIcon<CodedTextVO> node = new SelectableNodeWithIcon<CodedTextVO>(
-                    codedTextVO.getName(), codedTextVO, !multipleSelection, false, OpenEHRImageUtil.DV_CODED_TEXT_ICON, codedTextVO.getDescription());
+                    codedTextName, codedTextVO, !multipleSelection, false, OpenEHRImageUtil.DV_CODED_TEXT_ICON, codedTextVO.getDescription());
             CodedTextVO parentCodedTextVO = codedTextVO.getParentCodedText();
             if (parentCodedTextVO!=null){
                 SelectableNode<CodedTextVO> parentNode = nodeMap.get(parentCodedTextVO);

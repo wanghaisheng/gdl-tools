@@ -4,14 +4,12 @@ import se.cambio.cds.formgen.controller.FormGeneratorController;
 import se.cambio.cds.formgen.controller.sw.ExecuteRSW;
 import se.cambio.cds.gdl.model.readable.ReadableGuide;
 import se.cambio.cds.gdl.model.readable.rule.ReadableRule;
-import se.cambio.cds.model.facade.execution.vo.GeneratedElementInstance;
 import se.cambio.cds.model.facade.execution.vo.RuleExecutionResult;
 import se.cambio.cds.model.facade.execution.vo.RuleReference;
 import se.cambio.cds.model.instance.ArchetypeReference;
 import se.cambio.cds.model.instance.ElementInstance;
 import se.cambio.cds.util.Domains;
 import se.cambio.cds.view.swing.dialogs.DialogRuleExecutionList;
-import se.cambio.openehr.util.OpenEHRConstUI;
 import se.cambio.openehr.util.OpenEHRImageUtil;
 import se.cambio.openehr.util.OpenEHRLanguageManager;
 import se.cambio.openehr.view.util.JLinkLabel;
@@ -56,12 +54,12 @@ public class CDSFormPanel extends JPanel{
         this.revalidate();
     }
 
-    public void setInputElements(Collection<ElementInstance> elementInstances){
+    public void setInputElements(Collection<ArchetypeReference> archetypeReferences){
         this.removeAll();
         inputPanel = null;
         _eigps.clear();
-        if (elementInstances!=null){
-            addArchetypeReferences(getCompressedArchetypeReferencesForForm(elementInstances), true);
+        if (archetypeReferences!=null){
+            addArchetypeReferences(archetypeReferences, true);
         }
         init();
     }
@@ -106,56 +104,6 @@ public class CDSFormPanel extends JPanel{
             }
         }
         return archetypeReferences;
-    }
-
-    public Collection<ArchetypeReference> getCompressedArchetypeReferencesForForm(Collection<ElementInstance> elementInstances){
-        Map<String, ArchetypeReference> archetypeReferences = new HashMap<String, ArchetypeReference>();
-        //Compress Archetype References with same archetype id
-        for (ArchetypeReference arNew : getAllArchetypeReferences(elementInstances)) {
-            ArchetypeReference arOrig = archetypeReferences.get(arNew.getIdArchetype());
-            if (arOrig!=null){
-                compressArchetypeReference(arOrig, arNew);
-            }else{
-                arNew = getCleanArchetypeReferenceWithElements(arNew);
-                archetypeReferences.put(arNew.getIdArchetype(), arNew);
-            }
-        }
-        return new ArrayList<ArchetypeReference>(archetypeReferences.values());
-    }
-
-    public void compressArchetypeReference(ArchetypeReference arOrig, ArchetypeReference arNew){
-        for (ElementInstance ei : arNew.getElementInstancesMap().values()) {
-            ElementInstance eiAux = arOrig.getElementInstancesMap().get(ei.getId());
-            if (eiAux==null){
-                //Missing elements
-                cloneElementInstanceWithGTCodes(ei, arNew, false);
-            }else{
-                //Clear GT Code, archetype is referenced twice in guide
-                if (ei instanceof GeneratedElementInstance){
-                    GeneratedElementInstance gei = (GeneratedElementInstance) eiAux;
-                    gei.setGtCode(null);
-                }
-            }
-        }
-    }
-
-    public ArchetypeReference getCleanArchetypeReferenceWithElements(ArchetypeReference ar){
-        ArchetypeReference arNew = ar.clone();
-        for (ElementInstance ei : ar.getElementInstancesMap().values()) {
-            cloneElementInstanceWithGTCodes(ei, arNew, true);
-        }
-        return arNew;
-    }
-
-    private ElementInstance cloneElementInstanceWithGTCodes(ElementInstance ei, ArchetypeReference ar, boolean useGTCodes){
-        if (useGTCodes && ei instanceof GeneratedElementInstance){
-            GeneratedElementInstance gei = (GeneratedElementInstance) ei;
-            new GeneratedElementInstance(
-                    gei.getId(), null, ar, null, OpenEHRConstUI.NULL_FLAVOUR_CODE_NO_INFO, gei.getGuideId(), gei.getGtCode());
-        }else{
-            new ElementInstance(ei.getId(), null, ar, null, OpenEHRConstUI.NULL_FLAVOUR_CODE_NO_INFO);
-        }
-        return ei;
     }
 
     public Collection<ElementInstance> getElementInstances(){

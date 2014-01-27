@@ -27,6 +27,7 @@ public class GDLPanel extends JPanel implements RefreshablePanel{
         this.setLayout(new BorderLayout());
         DefaultSyntaxKit.initKit();
         DefaultSyntaxKit.registerContentType("text/gdl", GDLSyntaxKit.class.getCanonicalName());
+        this.setFocusable(true);
         refresh();
     }
 
@@ -60,8 +61,10 @@ public class GDLPanel extends JPanel implements RefreshablePanel{
         getEditorPane().setContentType("text/gdl");
         String gdlStr = _controller.serializeCurrentGuide();
         if (gdlStr!=null){
-            editorPane.setText(gdlStr);
+            getEditorPane().setText(gdlStr);
         }
+        this.repaint();
+        this.revalidate();
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {

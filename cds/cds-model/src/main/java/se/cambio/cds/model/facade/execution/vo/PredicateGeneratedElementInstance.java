@@ -30,6 +30,10 @@ public class PredicateGeneratedElementInstance extends GeneratedElementInstance{
         return operatorKind;
     }
 
+    public void setOperatorKind(OperatorKind operatorKind) {
+        this.operatorKind = operatorKind;
+    }
+
     /**
      * METHODS FOR THE RULE ENGINE!!
      * Do not use inside core (unless totally necessary)

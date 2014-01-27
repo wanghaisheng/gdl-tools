@@ -290,8 +290,11 @@ public class GDLDroolsConverter {
                                         .append("ElementInstance(id==\""
                                                 + idElement + "\", "
                                                 + predicateArchetypeRef
-                                                + "(dataValue instanceof DvOrdered) && "
-                                                + "((DvOrdered)dataValue)"+opStr+"((DvOrdered)$predDV"+ predicateCount+")"
+                                                /*
+                                                + "(dataValue instanceof DvOrdered) &&"
+                                                + "(((DvOrdered)dataValue)"+opStr+"((DvOrdered)$predDV"+ predicateCount+"))"
+                                                */
+                                                + "DVUtil.checkMaxMin($predDV"+ predicateCount+", dataValue, \""+op.getSymbol()+"\")"
                                                 +"))\n");
                                 /*
                                 String rmType = archetypeElement.getRMType();
@@ -623,6 +626,9 @@ public class GDLDroolsConverter {
                     DataValue dv = null;
                     if (!dvStr.equals("null")) {
                         ArchetypeElementVO archetypeElementVO = elementMap.get(var.getCode());
+                        if (archetypeElementVO==null){
+                            throw new InternalErrorException(new Exception("Element '"+var.getCode()+"' not found. (guideId='"+guide.getId()+"')"));
+                        }
                         String rmType = archetypeElementVO.getRMType();
                         dv = DataValue.parseValue(rmType + "," + dvStr);
                     }

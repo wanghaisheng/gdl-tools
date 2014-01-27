@@ -1,6 +1,5 @@
 package se.cambio.cds.controller.cds;
 
-import org.apache.log4j.Logger;
 import se.cambio.cds.controller.CDSSessionManager;
 import se.cambio.cds.controller.guide.GuideManager;
 import se.cambio.cds.gdl.model.Guide;
@@ -11,7 +10,11 @@ import se.cambio.cds.model.facade.kb.delegate.KBFacadeDelegate;
 import se.cambio.cds.model.facade.kb.delegate.KBFacadeDelegateFactory;
 import se.cambio.cds.model.instance.ArchetypeReference;
 import se.cambio.cds.model.instance.ElementInstance;
-import se.cambio.cds.util.*;
+import se.cambio.cds.util.DVUtil;
+import se.cambio.cds.util.Domains;
+import se.cambio.cds.util.ElementInstanceCollection;
+import se.cambio.cds.util.GeneratedElementInstanceCollection;
+import se.cambio.openehr.util.OpenEHRConstUI;
 import se.cambio.openehr.util.exceptions.InternalErrorException;
 import se.cambio.openehr.util.exceptions.PatientNotFoundException;
 
@@ -40,20 +43,9 @@ public class CDSManager {
             Collection<ElementInstance> elementInstances = elementInstanceMap.get(ehrId);
             if (elementInstances!=null){
                 Set<ArchetypeReference> archetypeReferences = new HashSet<ArchetypeReference>();
-                int count = 0;   //TODO Remove
                 for (ElementInstance elementInstance: elementInstances){
                     archetypeReferences.add(elementInstance.getArchetypeReference());
-                    count++;   //TODO Remove
                 }
-                //TODO Remove, used for testing
-                Logger.getLogger(CDSManager.class).info("Found "+count+" elements instances for ehrId "+ehrId+".");
-                PredicateFilterUtil.filterByPredicates(ars, archetypeReferences, date);
-                count = 0;
-                for (ArchetypeReference archetypeReference: archetypeReferences){
-                   count = count+archetypeReference.getElementInstancesMap().keySet().size();
-                }
-                Logger.getLogger(CDSManager.class).info("Using "+count+" elements instances for ehrId "+ehrId+" after filtering.");
-                //TODO Remove ends
                 eic.addAll(archetypeReferences, null);
             }
         }
@@ -90,44 +82,7 @@ public class CDSManager {
         Collection<ArchetypeReference> ars = new ArrayList<ArchetypeReference>();
         ars.addAll(eic.getAllArchetypeReferencesByDomain(Domains.EHR_ID));
         ars.addAll(eic.getAllArchetypeReferencesByDomain(ElementInstanceCollection.EMPTY_CODE));
-        Map<String, ArchetypeReference> resultARsMap = new HashMap<String, ArchetypeReference>();
-        //TODO Predicates, element selection
-        for (ArchetypeReference ar : ars) {
-            ArchetypeReference preAR = resultARsMap.get(ar.getIdArchetype());
-            if (preAR==null){
-                resultARsMap.put(ar.getIdArchetype(), ar);
-            }else{
-                Collection<ElementInstance> elementInstancesToRemove = new ArrayList<ElementInstance>();
-                for (ElementInstance elementInstance: preAR.getElementInstancesMap().values()){
-                    if (elementInstance instanceof PredicateGeneratedElementInstance){
-                        PredicateGeneratedElementInstance pgei = (PredicateGeneratedElementInstance)elementInstance;
-                        ElementInstance ei = ar.getElementInstancesMap().get(pgei.getId());
-                        if (ei instanceof PredicateGeneratedElementInstance){
-                            PredicateGeneratedElementInstance pgei2 = (PredicateGeneratedElementInstance)ei;
-                            if (!pgei.getOperatorKind().equals(pgei2.getOperatorKind()) ||
-                                    DVUtil.compareDVs(pgei.getDataValue(), pgei2.getDataValue())!=0){
-                                //Incompatible predicates found, we remove both
-                                //TODO Find a predicate (if possible) that includes both
-                                elementInstancesToRemove.add(elementInstance);
-                            }
-                        }
-                    }
-                }
-                for (ElementInstance elementInstance: elementInstancesToRemove){
-                     preAR.getElementInstancesMap().remove(elementInstance.getId());
-                    String gtCode = null;
-                    String guideId = null;
-                    if (elementInstance instanceof GeneratedElementInstance){
-                        GeneratedElementInstance gei = (GeneratedElementInstance)elementInstance;
-                        gtCode = gei.getGtCode();
-                        guideId = gei.getGuideId();
-                    }
-                    new GeneratedElementInstance(elementInstance.getId(), null, preAR, null, null, guideId, gtCode);   //We add the simple reference
-                }
-                //TODO Merge additional missing references from EHR and ANY domain
-            }
-        }
-        return resultARsMap.values();
+        return getCompressedQueryArchetypeReferences(ars);
     }
 
     private static Collection<ElementInstance> getElementInstances(ElementInstanceCollection eic, GeneratedElementInstanceCollection completeEIC, GuideManager guideManager, Calendar date)
@@ -180,6 +135,70 @@ public class CDSManager {
             }
         }
         return null;
+    }
+
+    private static Collection<ArchetypeReference> getCompressedQueryArchetypeReferences(Collection<ArchetypeReference> generatedArchetypeReferences){
+        Map<String, ArchetypeReference> archetypeReferencesMap = new HashMap<String, ArchetypeReference>();
+        //Compress Archetype References with same archetype id
+        for (ArchetypeReference arNew : generatedArchetypeReferences) {
+            ArchetypeReference arPrev = archetypeReferencesMap.get(arNew.getIdArchetype());
+            if (arPrev!=null){
+                compressQueryArchetypeReference(arPrev, arNew);
+            }else{
+                arNew = getCleanArchetypeReferenceWithElements(arNew);
+                archetypeReferencesMap.put(arNew.getIdArchetype(), arNew);
+            }
+        }
+        return new ArrayList<ArchetypeReference>(archetypeReferencesMap.values());
+    }
+
+    private static void compressQueryArchetypeReference(ArchetypeReference arPrev, ArchetypeReference arNew){
+        for (ElementInstance newEI : arNew.getElementInstancesMap().values()) {
+            ElementInstance eiAux = arPrev.getElementInstancesMap().get(newEI.getId());
+            if (eiAux==null){
+                //Missing elements
+                cloneElementInstanceWithGTCodes(newEI, arPrev, false);
+            }else{
+                if (newEI instanceof PredicateGeneratedElementInstance){
+                    PredicateGeneratedElementInstance pgeiNew = (PredicateGeneratedElementInstance)newEI;
+                    ElementInstance prevEI = arPrev.getElementInstancesMap().get(pgeiNew.getId());
+                    if (prevEI instanceof PredicateGeneratedElementInstance){
+                        PredicateGeneratedElementInstance pgeiPrev = (PredicateGeneratedElementInstance)prevEI;
+                        if (!pgeiNew.getOperatorKind().equals(pgeiPrev.getOperatorKind()) ||
+                                DVUtil.compareDVs(pgeiNew.getDataValue(), pgeiPrev.getDataValue())!=0){
+                            //TODO Find a predicate (if possible) that includes both
+                            //Incompatible predicates found, we remove data value and operation
+                            pgeiPrev.setDataValue(null);
+                            pgeiPrev.setOperatorKind(null);
+                        }
+                    }
+                }
+                if (eiAux instanceof GeneratedElementInstance){
+                    //Clear GT Code, archetype is referenced twice in guide
+                    GeneratedElementInstance gei = (GeneratedElementInstance) eiAux;
+                    gei.setGtCode(null);
+                }
+            }
+        }
+    }
+
+    private static ArchetypeReference getCleanArchetypeReferenceWithElements(ArchetypeReference ar){
+        ArchetypeReference arNew = ar.clone();
+        for (ElementInstance ei : ar.getElementInstancesMap().values()) {
+            cloneElementInstanceWithGTCodes(ei, arNew, true);
+        }
+        return arNew;
+    }
+
+    private static ElementInstance cloneElementInstanceWithGTCodes(ElementInstance ei, ArchetypeReference ar, boolean useGTCodes){
+        if (useGTCodes && ei instanceof GeneratedElementInstance){
+            GeneratedElementInstance gei = (GeneratedElementInstance) ei;
+            new GeneratedElementInstance(
+                    gei.getId(), null, ar, null, OpenEHRConstUI.NULL_FLAVOUR_CODE_NO_INFO, gei.getGuideId(), gei.getGtCode());
+        }else{
+            new ElementInstance(ei.getId(), null, ar, null, OpenEHRConstUI.NULL_FLAVOUR_CODE_NO_INFO);
+        }
+        return ei;
     }
 }
 /*

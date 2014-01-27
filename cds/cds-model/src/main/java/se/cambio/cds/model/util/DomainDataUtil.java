@@ -9,10 +9,7 @@ import se.cambio.cds.model.facade.execution.vo.PredicateGeneratedElementInstance
 import se.cambio.cds.model.instance.ArchetypeReference;
 import se.cambio.cds.model.instance.ElementInstance;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * User: iago.corbal

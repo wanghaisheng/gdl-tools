@@ -10,6 +10,7 @@ import se.cambio.cds.model.facade.execution.delegate.RuleExecutionFacadeDelegate
 import se.cambio.openehr.util.ExceptionHandler;
 import se.cambio.openehr.util.WindowManager;
 import se.cambio.openehr.util.exceptions.InternalErrorException;
+import se.cambio.openehr.view.dialogs.InfoDialog;
 
 import java.io.File;
 
@@ -19,6 +20,7 @@ public class InitGDLEditor {
         GDLEditorFrame ef = EditorManager.createEditorFrame();
         DialogSplash dialog = new DialogSplash(ef, true);
         WindowManager.registerMainWindow(ef);
+        WindowManager.registerProgressManager(new InfoDialog(ef));
         new LoadEditorSW(dialog).execute();
         dialog.setVisible(true);
         if (args.length>0){

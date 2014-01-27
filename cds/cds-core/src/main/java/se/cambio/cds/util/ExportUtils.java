@@ -86,6 +86,7 @@ public class ExportUtils {
             sb.append("<font face='Calibri'><i>");
             boolean first = true;
             for (String keyword : keywords) {
+                keyword = keyword.replace("\\\"","\"");
                 if (!first){
                     sb.append(", ");
                 }
@@ -101,6 +102,7 @@ public class ExportUtils {
             boolean first = true;
             sb.append("<font face='Calibri'><i>");
             for (String contributor : contributors) {
+                contributor = contributor.replace("\\\"","\"");
                 if (!first){
                     sb.append(", ");
                 }
@@ -142,6 +144,7 @@ public class ExportUtils {
         Term term = td.getTerms().get(gtCode);
         String text = term!=null?td.getTerms().get(gtCode).getText():null;
         if (text!=null){
+            text = text.replace("\\\"","\"");
             return text;
         }else{
             return "";
@@ -152,6 +155,7 @@ public class ExportUtils {
         Term term = td.getTerms().get(gtCode);
         String desc = term!=null?td.getTerms().get(gtCode).getDescription():null;
         if (desc!=null){
+            desc = desc.replace("\\\"","\"");
             return desc;
         }else{
             return "";
@@ -166,6 +170,9 @@ public class ExportUtils {
 
     public static String getValue(JXPathContext c, String path){
         String str = (String)c.getValue(path);
+        if (str!=null){
+            str = str.replace("\\\"","\"");
+        }
         return str!=null?str:"";
     }
 }

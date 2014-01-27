@@ -76,7 +76,7 @@ public class GuidePanel extends JPanel {
                     "HTML",
                     GDLEditorImageUtil.HTML_ICON,
                     getHTMLPanel());
-
+            guideEditorTabPane.setFocusable(true);
             for (GuideExportPlugin guideExportPlugin : GuideExportPluginDirectory.getGuideExportPlugins()) {
                 guideEditorTabPane.addTab(
                         guideExportPlugin.getPluginName(),
@@ -88,7 +88,7 @@ public class GuidePanel extends JPanel {
             guideEditorTabPane.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent e) {
                     if (e.getSource() instanceof JTabbedPane){
-                        Component comp = ((JTabbedPane)e.getSource()).getSelectedComponent();
+                        final Component comp = ((JTabbedPane)e.getSource()).getSelectedComponent();
                         _controller.tabChanged(comp);
                     }
                 }

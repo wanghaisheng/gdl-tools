@@ -1,11 +1,11 @@
 package se.cambio.cds.formgen.controller;
 
+import se.cambio.cds.controller.cds.CDSManager;
 import se.cambio.cds.controller.guide.GuideManager;
 import se.cambio.cds.formgen.view.panels.CDSFormPanel;
 import se.cambio.cds.gdl.model.Guide;
 import se.cambio.cds.gdl.model.Term;
 import se.cambio.cds.gdl.model.TermDefinition;
-import se.cambio.cds.util.GuideImporter;
 import se.cambio.cds.gdl.model.readable.ReadableGuide;
 import se.cambio.cds.gdl.parser.GDLParser;
 import se.cambio.cds.model.facade.cds.delegate.CDSExecutionFacadeDelegate;
@@ -13,9 +13,10 @@ import se.cambio.cds.model.facade.cds.delegate.CDSExecutionFacadeDelegateFactory
 import se.cambio.cds.model.facade.execution.vo.RuleExecutionResult;
 import se.cambio.cds.model.facade.execution.vo.RuleReference;
 import se.cambio.cds.model.guide.dto.GuideDTO;
+import se.cambio.cds.model.instance.ArchetypeReference;
 import se.cambio.cds.model.instance.ElementInstance;
-import se.cambio.cds.util.Domains;
-import se.cambio.cds.util.ElementInstanceCollection;
+import se.cambio.cds.util.GeneratedElementInstanceCollection;
+import se.cambio.cds.util.GuideImporter;
 import se.cambio.openehr.util.ExceptionHandler;
 import se.cambio.openehr.util.OpenEHRLanguageManager;
 import se.cambio.openehr.util.UserConfigurationManager;
@@ -53,7 +54,7 @@ public class FormGeneratorController {
     }
 
     private void init(){
-        getCDSFormPanel().setInputElements(getInputElementInstances());
+        getCDSFormPanel().setInputElements(getInputArcehtypeReferences());
     }
 
     public Collection<ElementInstance> getAllElementInstances(){
@@ -134,12 +135,9 @@ public class FormGeneratorController {
         _currentDate= currentDate;
     }
 
-    public Collection<ElementInstance> getInputElementInstances(){
-        Collection<ElementInstance> elementInstances = new ArrayList<ElementInstance>();
-        ElementInstanceCollection eic = getGuideManager().getCompleteElementInstanceCollection();
-        elementInstances.addAll(eic.getAllElementInstancesByDomain(Domains.EHR_ID));
-        elementInstances.addAll(eic.getAllElementInstancesByDomain(ElementInstanceCollection.EMPTY_CODE));
-        return elementInstances;
+    public Collection<ArchetypeReference> getInputArcehtypeReferences(){
+        GeneratedElementInstanceCollection eic = getGuideManager().getCompleteElementInstanceCollection();
+        return CDSManager.getEHRArchetypeReferences(eic);
     }
 
     public void updateResults(RuleExecutionResult result){

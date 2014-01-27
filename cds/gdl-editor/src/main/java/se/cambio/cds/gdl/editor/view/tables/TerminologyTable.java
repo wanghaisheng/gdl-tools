@@ -27,10 +27,19 @@ public class TerminologyTable extends JTable {
         columnIdentifiers.add(GDLEditorLanguageManager.getMessage("Description"));
         getTerminologyTableModel().setColumnIdentifiers(columnIdentifiers);
         this.getColumnModel().getColumn(0).setMaxWidth(80);
-        OntologyTableCellEditor cellEditor =
-                new OntologyTableCellEditor();
+        final TerminologyTableCellEditor cellEditor =
+                new TerminologyTableCellEditor();
         this.getColumnModel().getColumn(1).setCellEditor(cellEditor);
         this.getColumnModel().getColumn(2).setCellEditor(cellEditor);
+        this.putClientProperty("terminateEditOnFocusLost", true);
+        /*
+        this.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                super.focusLost(e);
+                cellEditor.stopCellEditing();
+            }
+        });*/
     }
 
     public TerminologyTableModel getTerminologyTableModel(){
@@ -50,31 +59,29 @@ public class TerminologyTable extends JTable {
         private static final long serialVersionUID = 1L;
     }
 
-    class OntologyTableCellEditor extends DefaultCellEditor{
+    public void updateResults(TerminologyTableCellEditor otce){
+        String value = (String)otce.getCellEditorValue();
+        int row = otce.getRow();
+        int column = otce.getColumn();
+        String gtCode = (String)getTerminologyTableModel().getValueAt(row, 0);
+        String attribute = column==1?"text":"description";
+        _context.setValue(gtCode+"/"+attribute, value);
+    }
 
+    private class TerminologyTableCellEditor extends DefaultCellEditor{
         private int _row;
         private int _column;
 
-        OntologyTableCellEditor() {
+        public TerminologyTableCellEditor() {
             super(new JTextField());
             this.addCellEditorListener(new CellEditorListener() {
                 public void editingStopped(ChangeEvent e) {
                     Object obj = e.getSource();
-                    if (obj instanceof OntologyTableCellEditor){
-                        updateResults((OntologyTableCellEditor)obj);
+                    if (obj instanceof TerminologyTableCellEditor){
+                        updateResults((TerminologyTableCellEditor)obj);
                     }
                 }
-
                 public void editingCanceled(ChangeEvent e) {
-                }
-
-                public void updateResults(OntologyTableCellEditor otce){
-                    String value = (String)otce.getCellEditorValue();
-                    int row = otce.getRow();
-                    int column = otce.getColumn();
-                    String gtCode = (String)getTerminologyTableModel().getValueAt(row, 0);
-                    String attribute = column==1?"text":"description";
-                    _context.setValue(gtCode+"/"+attribute, value);
                 }
             });
         }
@@ -82,7 +89,6 @@ public class TerminologyTable extends JTable {
         public int getRow(){
             return _row;
         }
-
         public int getColumn(){
             return _column;
         }
@@ -93,11 +99,6 @@ public class TerminologyTable extends JTable {
             _column = column;
             return super.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
-        /**
-         *
-         */
-        private static final long serialVersionUID = 1L;
-
     }
 }
 /*

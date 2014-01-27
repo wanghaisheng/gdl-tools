@@ -13,64 +13,64 @@ public class ArchetypeReference implements Serializable{
     private Map<String, ElementInstance> elementInstancesMap = null;
 
     public ArchetypeReference(String idDomain, String idArchetype, String idTemplate) {
-	this.idDomain = idDomain;
-	this.idArchetype = idArchetype;
-	this.idTemplate = idTemplate;
-	this.elementInstancesMap = new HashMap<String, ElementInstance>();
+        this.idDomain = idDomain;
+        this.idArchetype = idArchetype;
+        this.idTemplate = idTemplate;
+        this.elementInstancesMap = new HashMap<String, ElementInstance>();
     }
 
     protected void addElementInstance(ElementInstance ei){
-	this.elementInstancesMap.put(ei.getId(), ei);
+        this.elementInstancesMap.put(ei.getId(), ei);
     }
-    
+
     protected void removeElementInstance(ElementInstance ei){
-	this.elementInstancesMap.remove(ei.getId());
+        this.elementInstancesMap.remove(ei.getId());
     }
 
     public Map<String,ElementInstance> getElementInstancesMap(){
-	return elementInstancesMap;
+        return elementInstancesMap;
     }
 
     public String getIdDomain() {
-	return idDomain;
+        return idDomain;
     }
 
     public void setIdDomain(String idDomain) {
-	this.idDomain = idDomain;
+        this.idDomain = idDomain;
     }
 
     public String getIdArchetype() {
-	return idArchetype;
+        return idArchetype;
     }
 
     public void setIdArchetype(String idArchetype) {
-	this.idArchetype = idArchetype;
+        this.idArchetype = idArchetype;
     }
 
     public String getIdTemplate() {
-	return idTemplate;
+        return idTemplate;
     }
 
     public void setIdTemplate(String idTemplate) {
-	this.idTemplate = idTemplate;
+        this.idTemplate = idTemplate;
     }
 
 
     public ArchetypeReference clone(){
-	return new ArchetypeReference(idDomain, idArchetype, idTemplate);
+        return new ArchetypeReference(idDomain, idArchetype, idTemplate);
     }
 
     public String toString(){
-	StringBuffer sb = new StringBuffer();
-	sb.append(idArchetype+", "+idDomain);
-	if (idTemplate!=null){
-	    sb.append(", "+idTemplate);
-	}
-	sb.append("\n");
-	for (String idElement : elementInstancesMap.keySet()) {
-	    sb.append(elementInstancesMap.get(idElement).toString()+"\n");
-	}
-	return sb.toString();
+        StringBuffer sb = new StringBuffer();
+        sb.append(idArchetype+", "+idDomain);
+        if (idTemplate!=null){
+            sb.append(", "+idTemplate);
+        }
+        sb.append("\n");
+        for (String idElement : elementInstancesMap.keySet()) {
+            sb.append(elementInstancesMap.get(idElement).toString()+"\n");
+        }
+        return sb.toString();
     }
 }
 /*

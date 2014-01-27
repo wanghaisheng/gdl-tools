@@ -60,6 +60,8 @@ public class HTMLPanel extends JPanel implements RefreshablePanel{
             editorPanel = null;
         }
         this.add(getMainScrollPanel());
+        this.revalidate();
+        this.repaint();
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {

@@ -42,6 +42,7 @@ public class TerminologyPanel extends JPanel implements RefreshablePanel{
         this.setLayout(new BorderLayout());
         this.add(getEditButtonPanel(), BorderLayout.EAST);
         this.add(getMainPanel(), BorderLayout.CENTER);
+        this.setFocusable(true);
         refresh();
     }
 

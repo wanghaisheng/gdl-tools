@@ -1,16 +1,15 @@
 package se.cambio.cds.gdl.editor.view.panels;
 
-import java.awt.BorderLayout;
-
-import javax.swing.JPanel;
-
 import se.cambio.cds.gdl.editor.controller.GDLEditor;
 import se.cambio.cds.gdl.editor.view.panels.interfaces.RefreshablePanel;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class RefreshableDescriptionPanel extends JPanel implements RefreshablePanel{
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 
@@ -18,29 +17,29 @@ public class RefreshableDescriptionPanel extends JPanel implements RefreshablePa
     private DescriptionPanel descriptionPanel = null;
 
     public RefreshableDescriptionPanel(GDLEditor gdlEditor){
-	_controller = gdlEditor;
-	init();
+        _controller = gdlEditor;
+        init();
     }
 
     public void init(){
-	this.setLayout(new BorderLayout());
-	refresh();
+        this.setLayout(new BorderLayout());
+        refresh();
     }
 
     @Override
     public void refresh() {
-	this.removeAll();
-	descriptionPanel = null;
-	this.add(getDescriptionPanel());
-	this.revalidate();
-	this.repaint();
+        this.removeAll();
+        descriptionPanel = null;
+        this.add(getDescriptionPanel());
+        this.revalidate();
+        this.repaint();
     }
 
     private DescriptionPanel getDescriptionPanel(){
-	if (descriptionPanel==null){
-	    descriptionPanel = new DescriptionPanel(_controller);
-	}
-	return descriptionPanel;
+        if (descriptionPanel==null){
+            descriptionPanel = new DescriptionPanel(_controller);
+        }
+        return descriptionPanel;
     }
 }
 /*

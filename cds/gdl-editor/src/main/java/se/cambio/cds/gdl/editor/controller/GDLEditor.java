@@ -843,7 +843,12 @@ public class GDLEditor {
         runIfOkWithEditorState(comp, new Runnable() {
             @Override
             public void run() {
-                refreshPanel(refreshablePanel);
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        refreshPanel(refreshablePanel);
+                    }
+                });
             }
         });
     }
