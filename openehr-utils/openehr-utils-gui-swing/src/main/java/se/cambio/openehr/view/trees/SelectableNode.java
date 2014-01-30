@@ -86,11 +86,11 @@ public class SelectableNode<E> extends DefaultMutableTreeNode {
         return _seleccionUnica;
     }
 
-    public void setSeleccionUnica(Boolean seleccionUnica) {
+    public void setSingleSelection(Boolean seleccionUnica) {
         _seleccionUnica = seleccionUnica;
     }
 
-    public void setSeleccionado(Boolean seleccionado) {
+    public void setSelected(Boolean seleccionado) {
         _seleccionado = seleccionado;
     }
 
@@ -98,7 +98,7 @@ public class SelectableNode<E> extends DefaultMutableTreeNode {
         return _contineneSeleccionado;
     }
 
-    public void setContineneSeleccionado(Boolean seleccionado) {
+    public void setContainsSelected(Boolean seleccionado) {
         _contineneSeleccionado = seleccionado;
     }
 
@@ -106,14 +106,14 @@ public class SelectableNode<E> extends DefaultMutableTreeNode {
         _hierarchySelection = hierarchySelection;
     }
 
-    public void setAllSeleccionado(Boolean seleccionado) {
+    public void setAllSelected(Boolean seleccionado) {
         _seleccionado = seleccionado;
         _contineneSeleccionado = seleccionado;
         if (_hierarchySelection){
             if (!_seleccionUnica || !seleccionado){
                 Enumeration<?> e = children();
                 while (e.hasMoreElements()){
-                    ((SelectableNode<?>)e.nextElement()).setAllSeleccionado(seleccionado);
+                    ((SelectableNode<?>)e.nextElement()).setAllSelected(seleccionado);
                 }
             }
         }
@@ -140,7 +140,7 @@ public class SelectableNode<E> extends DefaultMutableTreeNode {
         return _descripcion;
     }
 
-    public void setDescripcion(String descripcion) {
+    public void setDescription(String descripcion) {
         _descripcion = descripcion;
     }
 
@@ -152,7 +152,7 @@ public class SelectableNode<E> extends DefaultMutableTreeNode {
         _tooltip = tooltip;
     }
 
-    public E getObjeto() {
+    public E getObject() {
         return _objeto;
     }
 
@@ -175,7 +175,7 @@ public class SelectableNode<E> extends DefaultMutableTreeNode {
     public void setForeground(Color color) {
         _foreground = color;
     }
-    public void setCursiva(Boolean cursiva) {
+    public void setItalics(Boolean cursiva) {
         _cursiva = cursiva;
     }
 
@@ -192,12 +192,12 @@ public class SelectableNode<E> extends DefaultMutableTreeNode {
             }
 
             //Borramos todas las selecciones existentes
-            nodoRaiz.setAllSeleccionado(false);
+            nodoRaiz.setAllSelected(false);
             if (!this.equals(nodoRaiz)){
                 if (_hierarchySelection){
-                    this.setSeleccionado(true);
+                    this.setSelected(true);
                 }
-                this.setContineneSeleccionado(true);
+                this.setContainsSelected(true);
             }
         }
         if (this.children !=null && this.children.contains(nodoSeleccionable)){

@@ -11,6 +11,7 @@ import se.cambio.openehr.view.trees.SelectableNode;
 import se.cambio.openehr.view.util.NodeConversor;
 
 import javax.swing.*;
+import javax.swing.plaf.TreeUI;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -114,7 +115,7 @@ public class DialogSelection extends DialogEditor {
 
 
     protected boolean cancelDialog(){
-        _rootNode.setAllSeleccionado(Boolean.FALSE);
+        _rootNode.setAllSelected(Boolean.FALSE);
         return true;
     }
 
@@ -122,7 +123,7 @@ public class DialogSelection extends DialogEditor {
         public void mouseClicked(MouseEvent e) {
             if(e.getClickCount()>1){
                 SelectableNode<?> selectableNode = NodeConversor.getSelectedNode(_rootNode, false);
-                if (selectableNode!=null && selectableNode.getSeleccionUnica() && selectableNode.getObjeto()!=null){
+                if (selectableNode!=null && selectableNode.getSeleccionUnica() && selectableNode.getObject()!=null){
                     accept();
                 }
             }
@@ -142,7 +143,10 @@ public class DialogSelection extends DialogEditor {
     }
 
     public void expandTree(){
+        TreeUI ui = getSelectionPanel().getJTree().getUI();
+        getSelectionPanel().getJTree().setUI(null);
         getSelectionPanel().getJTree().expand(_rootNode);
+        getSelectionPanel().getJTree().setUI(ui);
     }
 
 

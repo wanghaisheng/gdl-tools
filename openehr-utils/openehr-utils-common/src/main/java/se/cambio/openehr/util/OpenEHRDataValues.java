@@ -35,6 +35,8 @@ public class OpenEHRDataValues {
     public static final String TYPE_ATT = "type";
     public static final String TEMINOLOGYID_ATT = "terminologyId";
     public static final String CODE_ATT = "code";
+    public static final String DEFINING_CODE_ATT = "defining_code";
+    public static final String MAPPINGS_ATT = "mappings";
     
     public static final String YEAR_ATT = "year";
     public static final String MONTH_ATT = "month";

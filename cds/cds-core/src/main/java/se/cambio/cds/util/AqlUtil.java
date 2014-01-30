@@ -80,6 +80,6 @@ public class AqlUtil{
         if (j+1<i){
             return archetypeId.substring(j+1,i);
         }
-        return "OBSERVATION";
+        return "OBSERVATION";  //TODO
     }
 }

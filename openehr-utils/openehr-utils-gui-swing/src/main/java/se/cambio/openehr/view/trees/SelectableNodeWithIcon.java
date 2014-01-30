@@ -68,7 +68,7 @@ public class SelectableNodeWithIcon<E> extends SelectableNode<E> {
     }
 
     public SelectableNodeWithIcon<E> clone(){
-	return new SelectableNodeWithIcon<E>(getDescripcion(), getObjeto(), getSeleccionado(), _icono);
+	return new SelectableNodeWithIcon<E>(getDescripcion(), getObject(), getSeleccionado(), _icono);
     }
 
 }

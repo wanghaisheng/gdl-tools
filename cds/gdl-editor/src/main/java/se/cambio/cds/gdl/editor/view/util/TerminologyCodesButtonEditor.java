@@ -1,8 +1,13 @@
 
 package se.cambio.cds.gdl.editor.view.util;
 
-import java.awt.Component;
-import java.awt.Dimension;
+import se.cambio.cds.gdl.editor.controller.interfaces.TerminologyCodesManager;
+import se.cambio.cds.gdl.editor.controller.sw.LoadTerminologyViewerRSW;
+import se.cambio.cds.gdl.editor.view.panels.TerminologyCodesWithButtonPanel;
+import se.cambio.cds.gdl.editor.view.tables.BindingTable;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -10,18 +15,7 @@ import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.swing.DefaultCellEditor;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-
-import org.openehr.rm.datatypes.text.CodePhrase;
-
-import se.cambio.cds.gdl.editor.controller.EditorManager;
-import se.cambio.cds.gdl.editor.view.panels.TerminologyCodesWithButtonPanel;
-import se.cambio.cds.gdl.editor.view.tables.BindingTable;
-import se.cambio.openehr.view.dialogs.DialogSelection;
-
-public class TerminologyCodesButtonEditor extends DefaultCellEditor {
+public class TerminologyCodesButtonEditor extends DefaultCellEditor implements TerminologyCodesManager {
 
     private static final long serialVersionUID = 4720175033111295429L;
     private BindingTable _bt = null;
@@ -29,84 +23,80 @@ public class TerminologyCodesButtonEditor extends DefaultCellEditor {
     private int _row = 0;
 
     public TerminologyCodesButtonEditor(BindingTable bt) {
-	super(new JTextField());
-	_bt = bt;
-	_panel = new TerminologyCodesWithButtonPanel();
-	_panel.getTextField().addActionListener(new ActionListener() {
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-		_bt.getModel().setValueAt(_panel.getTextField().getText(), _row, 1);
-		_bt.updateResults();
-	    }
-	});
-	_panel.getTextField().addFocusListener(new FocusListener() {
-	    @Override
-	    public void focusLost(FocusEvent e) {
-		update();
-	    }
+        super(new JTextField());
+        _bt = bt;
+        _panel = new TerminologyCodesWithButtonPanel();
+        _panel.getTextField().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                _bt.getModel().setValueAt(_panel.getTextField().getText(), _row, 1);
+                _bt.updateResults();
+            }
+        });
+        _panel.getTextField().addFocusListener(new FocusListener() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                update();
+            }
 
-	    @Override
-	    public void focusGained(FocusEvent e) { }
-	});
+            @Override
+            public void focusGained(FocusEvent e) { }
+        });
 
-	_panel.getSearchButton().addActionListener(new SearchCodesActionListener());
+        _panel.getSearchButton().addActionListener(new SearchCodesActionListener());
     }
-    
-    private void update(){
-	_bt.getModel().setValueAt(_panel.getTextField().getText(), _row, 1);
-	_bt.updateResults();
+
+    public void update(){
+        _bt.getModel().setValueAt(_panel.getTextField().getText(), _row, 1);
+        _bt.updateResults();
+    }
+
+    @Override
+    public void setSelectedTerminologyCodes(Collection<String> terminologyCodes) {
+        StringBuffer sb = new StringBuffer();
+        boolean first = true;
+        for (String terminologyCode : terminologyCodes) {
+            if (!first){
+                sb.append(", ");
+            }else{
+                first = false;
+            }
+            sb.append(terminologyCode);
+
+        }
+        String terminologyCodesStr = sb.toString();
+        _panel.getTextField().setText(terminologyCodesStr);
     }
 
     public Component getTableCellEditorComponent(JTable table, Object value,
-	    boolean isSelected, int row, int column) {
-	_panel.getTextField().setText((String)value);
-	_row = row;
-	return _panel;
+                                                 boolean isSelected, int row, int column) {
+        _panel.getTextField().setText((String)value);
+        _row = row;
+        return _panel;
     }
 
+    public TerminologyCodesManager getTerminologyCodesManager(){
+        return this;
+    }
 
     private class SearchCodesActionListener implements ActionListener {
-	@Override
-	public void actionPerformed(ActionEvent e) {
-	    String terminologyCodes = _panel.getTextField().getText();
-	    Collection<String> selectedCodes = new ArrayList<String>();
-	    if (!terminologyCodes.isEmpty()){
-		String[] codes = terminologyCodes.split(",");
-		for (String code : codes) {
-		    selectedCodes.add(code.trim());
-		}
-	    }
-	    DialogSelection dialog = 
-		    new DialogSelection(
-			    EditorManager.getActiveEditorWindow(),
-			    _bt.getTerminologyId(),
-			    NodeDefinitionConversor.getNodeAllTerminologyCodes(_bt.getTerminologyId(), selectedCodes),
-			    false,
-			    new Dimension(500, 600));
-	    dialog.setResizable(true);
-	    dialog.setVisible(true);
-	    if (dialog.getAnswer()){
-		StringBuffer sb = new StringBuffer();
-		boolean first = true;
-		for (Object object : dialog.getSelectedObjects()) {
-		    if (!first){
-			sb.append(", ");
-		    }
-		    if (object instanceof CodePhrase){
-			sb.append(((CodePhrase)object).getCodeString());
-			first = false;
-		    }
-		}
-		terminologyCodes = sb.toString();
-		_panel.getTextField().setText(terminologyCodes);
-		update();
-	    }
-	}
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String terminologyCodes = _panel.getTextField().getText();
+            Collection<String> selectedCodes = new ArrayList<String>();
+            if (!terminologyCodes.isEmpty()){
+                String[] codes = terminologyCodes.split(",");
+                for (String code : codes) {
+                    selectedCodes.add(code.trim());
+                }
+            }
+            new LoadTerminologyViewerRSW(getTerminologyCodesManager(), _bt.getTerminologyId(), selectedCodes).execute();
+        }
     }
-    
+
     @Override
     public Object getCellEditorValue() {
-	return _panel.getTextField().getText();
+        return _panel.getTextField().getText();
     }
 }
 /*

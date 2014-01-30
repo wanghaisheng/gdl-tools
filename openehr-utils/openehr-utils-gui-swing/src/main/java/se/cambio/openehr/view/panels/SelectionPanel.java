@@ -6,14 +6,16 @@
  */
 package se.cambio.openehr.view.panels;
 
+import se.cambio.openehr.controller.sw.ExpandTreeRSW;
+import se.cambio.openehr.controller.sw.FilterTreeRSW;
 import se.cambio.openehr.util.OpenEHRImageUtil;
 import se.cambio.openehr.util.OpenEHRLanguageManager;
 import se.cambio.openehr.view.trees.SelectableNode;
 import se.cambio.openehr.view.trees.SelectionTree;
-import se.cambio.openehr.view.util.NodeConversor;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.plaf.TreeUI;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -151,10 +153,21 @@ public class SelectionPanel extends JPanel {
         return expandButton;
     }
 
+    private SelectionPanel getSelectionPanel(){
+        return this;
+    }
+
     private class ExpandTreeAction extends AbstractAction{
         private static final long serialVersionUID = 1L;
         public void actionPerformed(ActionEvent e) {
-            getJTree().expand(_nodoRaiz);
+            if (_bigList){
+                new ExpandTreeRSW(getSelectionPanel()).execute();
+            }else{
+                TreeUI ui = getJTree().getUI();
+                getJTree().setUI(null);
+                getJTree().expand(_nodoRaiz);
+                getJTree().setUI(ui);
+            }
         }
     }
 
@@ -237,11 +250,12 @@ public class SelectionPanel extends JPanel {
     }
 
     private void filter(){
-        NodeConversor.setAllVisible(_nodoRaiz);
-        NodeConversor.filterByText(
-                _nodoRaiz, getTextWithCleanButtonPanel().getJTextField().getText());
-        changeRootNode(_nodoRaiz);
-        getJTree().expand(_nodoRaiz);
+        if (_bigList){
+            new FilterTreeRSW(this).execute();
+        }else{
+            FilterTreeRSW.filterNode(this); //No need to do in a Swing Worker
+            getJTree().expand(getNode());
+        }
     }
 
 }  //  @jve:decl-index=0:visual-constraint="10,10"

@@ -1,5 +1,6 @@
 package se.cambio.cds.gdl.editor.view.util;
 
+import org.openehr.rm.datatypes.text.CodePhrase;
 import se.cambio.cds.controller.session.data.ArchetypeReferences;
 import se.cambio.cds.gdl.editor.controller.EditorManager;
 import se.cambio.cds.gdl.editor.util.GDLEditorImageUtil;
@@ -224,7 +225,7 @@ public class NodeDefinitionConversor {
                             getArchetypeElementRuleLineElementNode(aeirl, onlyCDSDomain);
                     if(nodeAux!=null){
                         GTCodeRuleLineElement gtCodeRuleLineElement =
-                                (GTCodeRuleLineElement)nodeAux.getObjeto();
+                                (GTCodeRuleLineElement)nodeAux.getObject();
                         addFieldsToNode(nodeAux, aeirl.getArchetypeElement().getRMType(), gtCodeRuleLineElement);
                         addFuntionsToNode(nodeAux, aeirl.getArchetypeElement().getRMType(), gtCodeRuleLineElement);
                         node.add(nodeAux);
@@ -375,12 +376,34 @@ public class NodeDefinitionConversor {
     public static SelectableNode<Object> getSelectableNodeTerminologyCodes(TerminologyNodeVO node, Collection <String> selectedCodes){
         String code = node.getValue().getDefiningCode().getCodeString();
         SelectableNodeWithIcon<Object> selectableNode =
-                new SelectableNodeWithIcon<Object>(node.getValue().getValue() +" ("+code+")", node.getValue().getDefiningCode(), false, selectedCodes.contains(code), GDLEditorImageUtil.ONTOLOGY_ICON);
+                new SelectableNodeWithIcon<Object>(node.getValue().getValue() +" ("+code+")", node.getValue().getDefiningCode(), false, selectedCodes!=null && selectedCodes.contains(code), GDLEditorImageUtil.ONTOLOGY_ICON);
         selectableNode.setHierarchySelection(false);
         for (TerminologyNodeVO node2 : node.getChildren()) {
             selectableNode.add(getSelectableNodeTerminologyCodes(node2, selectedCodes));
         }
         return selectableNode;
+    }
+
+    public static boolean selectCodesWith(SelectableNode<?> node, Object object, boolean multiple){
+        if (node.getObject() instanceof CodePhrase){
+            if (object.equals(((CodePhrase)node.getObject()).getCodeString())){
+                node.setSelected(true);
+                if (!multiple){
+                    return true;
+                }
+            }
+        }
+        Enumeration<?>  e = node.getAllchildren();
+        while(e.hasMoreElements()){
+            Object nodeObj = e.nextElement();
+            if (nodeObj instanceof SelectableNode){
+                boolean found = selectCodesWith((SelectableNode)nodeObj, object, multiple);
+                if (found && !multiple){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
 /*

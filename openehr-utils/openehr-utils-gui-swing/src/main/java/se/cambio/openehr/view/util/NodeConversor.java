@@ -46,7 +46,7 @@ public class NodeConversor {
             }
         }
         if (raizNodo.getSeleccionUnica()){
-            raizNodo.setSeleccionado(false);
+            raizNodo.setSelected(false);
         }
         raizNodo.setVisible(visible);
         if (visible){
@@ -67,12 +67,12 @@ public class NodeConversor {
 
     public static Object getSelectedObject(SelectableNode<?> nodoRaiz){
         SelectableNode<?> selectedNode = getSelectedNode(nodoRaiz, false);
-        return selectedNode!=null?selectedNode.getObjeto():null;
+        return selectedNode!=null?selectedNode.getObject():null;
     }
 
     public static Object getSelectedObject(SelectableNode<?> nodoRaiz, boolean allowParent){
         SelectableNode<?> selectedNode = getSelectedNode(nodoRaiz, allowParent);
-        return selectedNode!=null?selectedNode.getObjeto():null;
+        return selectedNode!=null?selectedNode.getObject():null;
     }
 
     public static SelectableNode<?> getSelectedNode(SelectableNode<?> nodoRaiz, boolean allowParent){
@@ -99,7 +99,7 @@ public class NodeConversor {
         addSelectedNodes(nodoRaiz, selectedNodes, searchType);
         Collection<Object> objs = new ArrayList<Object>();
         for (SelectableNode<?> nodoSeleccionable : selectedNodes) {
-            objs.add(nodoSeleccionable.getObjeto());
+            objs.add(nodoSeleccionable.getObject());
         }
         return objs;
     }
@@ -128,8 +128,8 @@ public class NodeConversor {
         Enumeration<?> e = nodoRaiz.getAllchildren();
         while (e.hasMoreElements()){
             SelectableNode<?> node = (SelectableNode<?>)e.nextElement();
-            if (obj.equals(node.getObjeto())){
-                node.setSeleccionado(true);
+            if (obj.equals(node.getObject())){
+                node.setSelected(true);
                 node.cambioEstado(node);
                 return true;
             }else{

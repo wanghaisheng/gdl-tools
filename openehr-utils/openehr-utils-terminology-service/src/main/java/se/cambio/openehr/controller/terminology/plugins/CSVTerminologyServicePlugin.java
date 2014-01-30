@@ -137,27 +137,14 @@ public class CSVTerminologyServicePlugin implements TerminologyServicePlugin {
             ArrayList<TerminologyNodeVO> allNodes = new ArrayList<TerminologyNodeVO>();
             for (String code : _descriptionsMap.keySet()) {
                 if (!code.isEmpty() && _parentsMap.get(code)==null){
-                    TerminologyNodeVO node = getNodeForCode(code, language);
-                    ArrayList<String> children = _childrenMap.get(code);
-                    if (children != null) {
-                        for (String childCode : children) {
-                            TerminologyNodeVO nodeAux = retrieveAllSubclasses(childCode, language);
-                            if (nodeAux != null) {
-                                node.addChild(nodeAux);
-                            }
-                        }
-                    }
-                    allNodes.add(node);
+                    //if (code.equals("138875005")){
+                        TerminologyNodeVO node = retrieveAllSubclasses(code, language);
+                        allNodes.add(node);
+                    //}
+
                 }
             }
-            //Nodes without parent/children
-	    /*
-	    for (String code : _descriptionsMap.keySet()) {
-		if (!_childrenMap.keySet().contains(code) &&
-			!_parentsMap.containsKey(code)){
-		    allNodes.add(getNodeForCode(code, language));
-		}
-	    }*/
+            //System.out.println("allNodes="+allNodes.size());
             return allNodes;
         }else{
             throw new UnsupportedTerminologyException(terminologyId+ " not supported");

@@ -1,66 +1,63 @@
 package se.cambio.cds.gdl.editor.view.dialog;
 
-import java.awt.Dimension;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-
 import se.cambio.cds.gdl.editor.controller.GDLEditor;
 import se.cambio.cds.gdl.editor.util.GDLEditorLanguageManager;
 import se.cambio.cds.gdl.editor.view.util.NodeDefinitionConversor;
 import se.cambio.openehr.util.OpenEHRImageUtil;
 import se.cambio.openehr.view.dialogs.DialogSelection;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 public class DialogTerminologyIdSelection extends DialogSelection{
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
     private JButton addTerminologyButton;
     private String _terminologyIdCreated = null;
 
     public DialogTerminologyIdSelection(Window owner, GDLEditor controller) {
-	super(
-		owner, 
-		GDLEditorLanguageManager.getMessage("AddTerminologyDesc"), 
-		NodeDefinitionConversor.getNodeTerminologyIds(),
-		true, 
-		new Dimension(500,500));
-	getSelectionPanel().getFilterPanel().add(getAddTerminologyButton());
+        super(
+                owner,
+                GDLEditorLanguageManager.getMessage("AddTerminologyDesc"),
+                NodeDefinitionConversor.getNodeTerminologyIds(),
+                true,
+                new Dimension(500,500));
+        getSelectionPanel().getFilterPanel().add(getAddTerminologyButton());
     }
 
     private JButton getAddTerminologyButton(){
-	if (addTerminologyButton==null){
-	    addTerminologyButton = new JButton(GDLEditorLanguageManager.getMessage("AddTerminology"));
-	    addTerminologyButton.setIcon(OpenEHRImageUtil.ADD_ICON);
-	    addTerminologyButton.addActionListener(new AddTerminologyActionListener(this));
-	}
-	return addTerminologyButton;
+        if (addTerminologyButton==null){
+            addTerminologyButton = new JButton(GDLEditorLanguageManager.getMessage("AddTerminology"));
+            addTerminologyButton.setIcon(OpenEHRImageUtil.ADD_ICON);
+            addTerminologyButton.addActionListener(new AddTerminologyActionListener(this));
+        }
+        return addTerminologyButton;
     }
 
     public String getSelectedObject(){
-	if (_terminologyIdCreated!=null){
-	    return _terminologyIdCreated;
-	}else{
-	    return (String)super.getSelectedObject();
-	}
+        if (_terminologyIdCreated!=null){
+            return _terminologyIdCreated;
+        }else{
+            return (String)super.getSelectedObject();
+        }
     }
-    
+
     private class AddTerminologyActionListener implements ActionListener{
-	private JDialog _dialog = null;
-	public AddTerminologyActionListener(JDialog dialog){
-	    _dialog = dialog;
-	}
-	public void actionPerformed(ActionEvent e) {
-	    DialogNameInsert dialog = new DialogNameInsert(_dialog, GDLEditorLanguageManager.getMessage("AddTerminologyDesc"), null);
-	    if (dialog.getAnswer()){
-		_terminologyIdCreated = dialog.getValue();
-		accept();
-	    }
-	}
+        private JDialog _dialog = null;
+        public AddTerminologyActionListener(JDialog dialog){
+            _dialog = dialog;
+        }
+        public void actionPerformed(ActionEvent e) {
+            DialogNameInsert dialog = new DialogNameInsert(_dialog, GDLEditorLanguageManager.getMessage("AddTerminologyDesc"), null);
+            if (dialog.getAnswer()){
+                _terminologyIdCreated = dialog.getValue();
+                accept();
+            }
+        }
     }
 }
 /*
