@@ -124,7 +124,7 @@ public class ReadableArchetypeReferencesUtil {
                 if (paearle!=null){
                     ArchetypeElementVO archetypeElementVO = paearle.getValue();
                     String attribute = paearle.getAttribute();
-                    if (archetypeElementVO!=null){
+                    if (archetypeElementVO!=null && pacorl.getValue()!=null){
                         sb.append(archetypeElementVO.getName()+"."+attribute+" "+pacorl.getValue().getSymbol()+" "+ere.toString());
                     }else{
                         Logger.getLogger(ArchetypeReference.class).warn("Unknown predicate for AR '"+paearle.toString()+"'");

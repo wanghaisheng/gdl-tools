@@ -1,5 +1,6 @@
 package se.cambio.cds.controller.session.data;
 
+import org.apache.log4j.Logger;
 import se.cambio.cds.gdl.model.Guide;
 import se.cambio.cds.gdl.model.ResourceDescriptionItem;
 import se.cambio.cds.model.facade.administration.delegate.CDSAdministrationFacadeDelegate;
@@ -18,6 +19,7 @@ public class Guides {
     private static Guides _delegate = null;
     private Map<String, GuideDTO> _guidesMap = null;
     private Map<String, Collection<String>> _keywordsMap = null;
+    private boolean _loaded = false;
 
     private Guides(){
     }
@@ -26,12 +28,18 @@ public class Guides {
         getGuidesMap().clear();
         getKeywordsMap().clear();
     }
-
     public static void loadGuides() throws InternalErrorException{
-        init();
-        CDSAdministrationFacadeDelegate adminFD = CDSAdministrationFacadeDelegateFactory.getDelegate();
-        Collection<GuideDTO> guideDTOs = adminFD.searchAllGuides();
-        loadGuides(guideDTOs);
+        loadGuides(false);
+    }
+
+    public static void loadGuides(boolean force) throws InternalErrorException{
+        if (!getDelegate()._loaded || force){
+            init();
+            CDSAdministrationFacadeDelegate adminFD = CDSAdministrationFacadeDelegateFactory.getDelegate();
+            Collection<GuideDTO> guideDTOs = adminFD.searchAllGuides();
+            loadGuides(guideDTOs);
+            getDelegate()._loaded = true;
+        }
     }
 
     public static void loadGuidesById(Collection<String> guideIds) throws InternalErrorException, GuideNotFoundException {
@@ -61,6 +69,8 @@ public class Guides {
                     getKeywordsMap().put(guide.getId(), rdi.getKeywords());
                 }
             }
+            Logger.getLogger(Guides.class).info("Registering guideline: '"+guideDTO.getIdGuide()+"'.");
+
         }catch(Exception e){
             throw new InternalErrorException(e);
         }

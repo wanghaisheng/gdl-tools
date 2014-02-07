@@ -1,4 +1,5 @@
 package se.cambio.openehr.controller.terminology.session.data;
+import org.apache.log4j.Logger;
 import se.cambio.openehr.model.facade.administration.delegate.OpenEHRAdministrationFacadeDelegateFactory;
 import se.cambio.openehr.model.terminology.dto.TerminologyDTO;
 import se.cambio.openehr.model.util.comparators.TerminologyComparator;
@@ -23,6 +24,7 @@ public class Terminologies {
     public static void loadTerminologies(Collection<TerminologyDTO> terminologyDTOs) throws InternalErrorException{
         init();
         for (TerminologyDTO terminologyDTO: terminologyDTOs){
+            Logger.getLogger(Terminologies.class).info("Registering terminology: '"+terminologyDTO.getTerminologyId()+"'.");
             registerTerminology(terminologyDTO);
         }
     }

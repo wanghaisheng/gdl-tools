@@ -22,16 +22,26 @@ public class Templates {
     }
 
     public static void loadTemplates() throws InternalErrorException{
+        loadTemplates(false);
+    }
+
+    public static void loadTemplates(boolean force) throws InternalErrorException{
         Collection<TemplateDTO> templateDTOs =
                 OpenEHRSessionManager.getAdministrationFacadeDelegate().searchAllTemplates();
-        loadTemplates(templateDTOs);
-        getDelegate()._loaded = true;
+        loadTemplates(templateDTOs, force);
     }
 
     public static void loadTemplates(Collection<TemplateDTO> templateDTOs) throws InternalErrorException{
-        init();
-        OpenEHRObjectBundleManager.generateTemplateObjectBundles(templateDTOs);
-        loadTemplateObjectBundles(templateDTOs);
+        loadTemplates(templateDTOs, false);
+    }
+
+    public static void loadTemplates(Collection<TemplateDTO> templateDTOs, boolean force) throws InternalErrorException{
+        if (!getDelegate()._loaded || force){
+            init();
+            OpenEHRObjectBundleManager.generateTemplateObjectBundles(templateDTOs);
+            loadTemplateObjectBundles(templateDTOs);
+            getDelegate()._loaded = true;
+        }
     }
 
     public static void loadTemplate(TemplateDTO templateVO) throws InternalErrorException{

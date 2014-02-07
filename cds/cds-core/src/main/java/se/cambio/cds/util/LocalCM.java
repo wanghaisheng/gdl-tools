@@ -1,5 +1,6 @@
 package se.cambio.cds.util;
 
+import org.apache.log4j.Logger;
 import se.cambio.openehr.util.ExceptionHandler;
 import se.cambio.openehr.util.exceptions.InternalErrorException;
 import se.cambio.openehr.util.exceptions.MissingConfigurationParameterException;
@@ -15,46 +16,59 @@ import java.io.*;
 public class LocalCM {
 
     private static String AUTO_SAVE_FILE_CM_PREFIX = "auto.cm";
+    private static LocalCM _instance;
+    private boolean loaded = false;
 
     public static void loadLocalCM() throws InternalErrorException {
-        String hostname = null;
-        try{
-            hostname = OpenEHRConfigurationParametersManager.getParameter(OpenEHRConfigurationParametersManager.OPENEHR_SERVER_HOST);
-        } catch (MissingConfigurationParameterException e) {
-        }
-        if (hostname==null){
-            hostname = "local";
-        }
-        String fileName = AUTO_SAVE_FILE_CM_PREFIX+"."+hostname+".zip";
-        InputStream is = null;
-        try{
-            is = LocalCM.class.getClassLoader().getResourceAsStream(fileName);
-            if (is==null){
-                File file = new File(fileName);
-                if (file.exists()){
+        loadLocalCM(false);
+    }
+
+    public static boolean isLoaded(){
+        return getDelegate().loaded;
+    }
+
+    public static void loadLocalCM(boolean force) throws InternalErrorException {
+        if (!isLoaded() || force){
+            String hostname = null;
+            try{
+                hostname = OpenEHRConfigurationParametersManager.getParameter(OpenEHRConfigurationParametersManager.OPENEHR_SERVER_HOST);
+            } catch (MissingConfigurationParameterException e) {
+            }
+            if (hostname==null){
+                hostname = "local";
+            }
+            String fileName = AUTO_SAVE_FILE_CM_PREFIX+"."+hostname+".zip";
+            Logger.getLogger(LocalCM.class).info("Loading data from local CM. Using '"+fileName+"'...");
+            InputStream is = null;
+            try{
+                is = LocalCM.class.getClassLoader().getResourceAsStream(fileName);
+                if (is==null){
+                    File file = new File(fileName);
+                    if (file.exists()){
+                        try {
+                            is = new FileInputStream(file);
+                        } catch (FileNotFoundException e) {
+                            ExceptionHandler.handle(e);
+                        }
+                    }
+                }
+                if (is!=null){
                     try {
-                        is = new FileInputStream(file);
-                    } catch (FileNotFoundException e) {
+                        CMImportExportManager.importCM(is);
+                    } catch (IOException e) {
+                        throw new InternalErrorException(e);
+                    }
+                }
+            }finally {
+                if (is!=null){
+                    try {
+                        is.close();
+                    } catch (IOException e) {
                         ExceptionHandler.handle(e);
                     }
                 }
             }
-            if (is!=null){
-                try {
-                    CMImportExportManager.importCM(is);
-                } catch (IOException e) {
-                    throw new InternalErrorException(e);
-                }
-            }
-        }finally {
-            if (is!=null){
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    ExceptionHandler.handle(e);
-                }
-            }
-
+            getDelegate().loaded = true;
         }
     }
 
@@ -73,5 +87,12 @@ public class LocalCM {
         } catch (IOException e) {
             throw new InternalErrorException(e);
         }
+    }
+
+    private static LocalCM getDelegate(){
+        if (_instance==null){
+            _instance = new LocalCM();
+        }
+        return _instance;
     }
 }

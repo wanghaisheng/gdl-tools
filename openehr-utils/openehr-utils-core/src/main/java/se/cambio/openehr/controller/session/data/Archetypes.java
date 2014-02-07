@@ -25,18 +25,28 @@ public class Archetypes {
     private Archetypes(){
     }
 
+
     public static void loadArchetypes() throws InternalErrorException{
-        init();
-        getDelegate()._loaded = true;
-        Collection<ArchetypeDTO> archetypeDTOs =
-                OpenEHRSessionManager.getAdministrationFacadeDelegate().searchAllArchetypes();
-        loadArchetypes(archetypeDTOs);
+        loadArchetypes(false);
     }
 
-    public static void loadArchetypes(Collection<ArchetypeDTO> archetypeDTOs) throws InternalErrorException{
+    public static void loadArchetypes(boolean force) throws InternalErrorException{
         init();
-        OpenEHRObjectBundleManager.generateArchetypesObjectBundles(archetypeDTOs);
-        loadArchetypesObjectBundle(archetypeDTOs);
+        Collection<ArchetypeDTO> archetypeDTOs =
+                OpenEHRSessionManager.getAdministrationFacadeDelegate().searchAllArchetypes();
+        loadArchetypes(archetypeDTOs, force);
+    }
+    public static void loadArchetypes(Collection<ArchetypeDTO> archetypeDTOs) throws InternalErrorException{
+        loadArchetypes(archetypeDTOs, false);
+    }
+
+    public static void loadArchetypes(Collection<ArchetypeDTO> archetypeDTOs, boolean force) throws InternalErrorException{
+        if (!getDelegate()._loaded || force){
+            init();
+            OpenEHRObjectBundleManager.generateArchetypesObjectBundles(archetypeDTOs);
+            loadArchetypesObjectBundle(archetypeDTOs);
+            getDelegate()._loaded = true;
+        }
     }
 
     public static void loadArchetype(ArchetypeDTO archetypeDTO) throws InternalErrorException{
