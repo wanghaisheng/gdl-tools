@@ -1,16 +1,17 @@
 package se.cambio.cds.model.facade.kb.plain;
 
+import se.cambio.cds.model.facade.kb.delegate.KBFacadeDelegate;
+import se.cambio.cds.model.instance.ElementInstance;
+import se.cambio.openehr.util.exceptions.InternalErrorException;
+
 import java.util.ArrayList;
 import java.util.Collection;
-
-import se.cambio.cds.model.facade.execution.vo.ElementInstance;
-import se.cambio.cds.model.facade.kb.delegate.KBFacadeDelegate;
-import se.cambio.cds.util.exceptions.InternalErrorException;
 /**
  * @author iago.corbal
  *
  */
 public class EmptyKBFacadeDelegate implements KBFacadeDelegate{
+    
     public Collection<String> getAllIdTemplates()
 	    throws InternalErrorException{
 	return new ArrayList<String>();

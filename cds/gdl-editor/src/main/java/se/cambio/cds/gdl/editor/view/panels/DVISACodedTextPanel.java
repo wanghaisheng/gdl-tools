@@ -1,22 +1,18 @@
 package se.cambio.cds.gdl.editor.view.panels;
 
-import java.awt.FlowLayout;
+import org.openehr.rm.datatypes.basic.DataValue;
+import org.openehr.rm.datatypes.text.DvCodedText;
+import org.openehr.rm.datatypes.text.DvText;
+import se.cambio.cds.gdl.editor.controller.GDLEditor;
+import se.cambio.cds.gdl.editor.util.GDLEditorLanguageManager;
+import se.cambio.openehr.view.panels.DVGenericPanel;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
-
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-
-import org.openehr.rm.datatypes.basic.DataValue;
-import org.openehr.rm.datatypes.text.DvCodedText;
-import org.openehr.rm.datatypes.text.DvText;
-
-import se.cambio.cds.gdl.editor.controller.GDLEditor;
-import se.cambio.cds.gdl.editor.util.LanguageManager;
-import se.cambio.cds.openehr.view.panels.DVGenericPanel;
 
 public class DVISACodedTextPanel extends DVGenericPanel{
 
@@ -68,8 +64,8 @@ public class DVISACodedTextPanel extends DVGenericPanel{
     private JComboBox getJComboBox(){
 	if (comboBox==null){
 	    comboBox = new JComboBox();
-	    comboBox.addItem(LanguageManager.getMessage("Default"));
-	    comboBox.addItem(LanguageManager.getMessage("Binding"));
+	    comboBox.addItem(GDLEditorLanguageManager.getMessage("Default"));
+	    comboBox.addItem(GDLEditorLanguageManager.getMessage("Binding"));
 	    comboBox.addActionListener(new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {

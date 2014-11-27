@@ -1,10 +1,18 @@
 package se.cambio.cds.gdl.model;
 
-import java.util.*;
-
 import se.cambio.cds.gdl.model.expression.ExpressionItem;
 
-public class ArchetypeBinding {
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public class ArchetypeBinding  implements Serializable{
+
+	/**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
 	public ArchetypeBinding() {
 	}
@@ -12,7 +20,7 @@ public class ArchetypeBinding {
 	private String archetypeId;
 	private String templateId;
 	private String domain;
-	private String function;
+	//private String function;
 	private String timeRange;
 	private Map<String, ElementBinding> elements;
 	private List<String> predicates;
@@ -63,20 +71,23 @@ public class ArchetypeBinding {
 		this.domain = domain;
 	}
 
+
 	/**
 	 * @return the function
 	 */
+    /*
 	public String getFunction() {
 		return function;
-	}
+	} */
 
 	/**
 	 * @param function
 	 *            the function to set
 	 */
+    /*
 	public void setFunction(String function) {
 		this.function = function;
-	}
+	} */
 
 	/**
 	 * @return the timeRange
@@ -166,8 +177,9 @@ public class ArchetypeBinding {
 		result = prime * result + ((domain == null) ? 0 : domain.hashCode());
 		result = prime * result
 				+ ((elements == null) ? 0 : elements.hashCode());
+        /*
 		result = prime * result
-				+ ((function == null) ? 0 : function.hashCode());
+				+ ((function == null) ? 0 : function.hashCode());   */
 		result = prime
 				* result
 				+ ((predicateStatements == null) ? 0 : predicateStatements
@@ -210,11 +222,13 @@ public class ArchetypeBinding {
 				return false;
 		} else if (!elements.equals(other.elements))
 			return false;
+        /*
 		if (function == null) {
 			if (other.function != null)
 				return false;
 		} else if (!function.equals(other.function))
 			return false;
+			*/
 		if (predicates == null) {
 			if (other.predicates != null)
 				return false;

@@ -1,25 +1,25 @@
 package se.cambio.cds.model.guide.dao;
 
+import se.cambio.cds.model.guide.dto.GuideDTO;
+import se.cambio.cds.util.exceptions.GuideNotFoundException;
+import se.cambio.openehr.util.ExceptionHandler;
+import se.cambio.openehr.util.IOUtils;
+import se.cambio.openehr.util.Resources;
+import se.cambio.openehr.util.exceptions.InternalErrorException;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-
-import se.cambio.cds.model.guide.dto.GuideDTO;
-import se.cambio.cds.util.IOUtils;
-import se.cambio.cds.util.Resources;
-import se.cambio.cds.util.exceptions.GuideNotFoundException;
-import se.cambio.cds.util.exceptions.InternalErrorException;
-import se.cambio.cds.util.exceptions.ModelException;
-import se.cambio.cds.util.handlers.ExceptionHandler;
+import java.util.Date;
 
 public class InJarGuideDAO implements GenericGuideDAO{
 
     private static String GUIDES_FOLDER = "Guides";
 
-    public GuideDTO search(String idGuide) throws InternalErrorException,
+    public GuideDTO searchByGuideId(String idGuide) throws InternalErrorException,
     GuideNotFoundException {
 	String fileName = GUIDES_FOLDER+"/"+idGuide+".guide";
 	InputStream is = InJarGuideDAO.class.getClassLoader().getResourceAsStream(fileName);
@@ -90,8 +90,12 @@ public class InJarGuideDAO implements GenericGuideDAO{
 	return guides;
     }
 
-    public GuideDTO add(GuideDTO guideDTO) throws InternalErrorException,
-    ModelException {
+    @Override
+    public Collection<GuideDTO> searchAllDefinitions() throws InternalErrorException {
+        return searchAll();
+    }
+
+    public GuideDTO add(GuideDTO guideDTO) throws InternalErrorException{
 	return null;
     }
 
@@ -102,6 +106,11 @@ public class InJarGuideDAO implements GenericGuideDAO{
 
     public void remove(String idGuide) throws InternalErrorException,
     GuideNotFoundException {
+    }
+
+    public Date getLastUpdateDate()
+            throws InternalErrorException{
+        return null;
     }
 }
 /*

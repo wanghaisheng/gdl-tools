@@ -1,29 +1,20 @@
 package se.cambio.cds.gdl.editor.view.panels;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import org.apache.commons.jxpath.JXPathContext;
+import se.cambio.cds.gdl.editor.controller.EditorManager;
+import se.cambio.cds.gdl.editor.util.GDLEditorImageUtil;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
-import org.apache.commons.jxpath.JXPathContext;
-
-import se.cambio.cds.gdl.editor.controller.EditorManager;
-import se.cambio.cds.gdl.editor.util.GDLEditorImageUtil;
-
 public class ListPanel extends JPanel{
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
     private String _title;
@@ -32,72 +23,80 @@ public class ListPanel extends JPanel{
     private JList jList;
 
     public ListPanel(String title, String xPath, JXPathContext context){
-	_title = title;
-	_xPath = xPath;
-	_context = context;
-	Object obj = context.getValue(xPath);
-	if (obj instanceof List){
-	    DefaultListModel dlm = ((DefaultListModel)getJList().getModel());
-	    for (Object objAux : (List<?>)obj) {
-		dlm.addElement((String)objAux);
-	    }
-	}
-	init();
+        _title = title;
+        _xPath = xPath;
+        _context = context;
+        Object obj = context.getValue(xPath);
+        if (obj instanceof List){
+            DefaultListModel dlm = ((DefaultListModel)getJList().getModel());
+            for (Object objAux : (List<?>)obj) {
+                String value = (String)objAux;
+                if (value!=null){
+                    value = value.replace("\\\"","\"");
+                }
+                dlm.addElement(value);
+            }
+        }
+        init();
     }
 
     private void init(){
-	this.setLayout(new BorderLayout());
-	this.setBorder(BorderFactory.createTitledBorder(_title));
-	JPanel buttonPanel = new JPanel();
-	buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-	JButton addButton = new JButton(GDLEditorImageUtil.ADD_ICON);
-	addButton.setContentAreaFilled(false);
-	addButton.setPreferredSize(new Dimension(16,16));
-	addButton.setBorderPainted(false);
-	addButton.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent e) {
-		String value = JOptionPane.showInputDialog(EditorManager.getActiveEditorWindow(), _title, "");
-		if(value!=null){
-		    DefaultListModel dlm = ((DefaultListModel)getJList().getModel());
-		    dlm.addElement(value);
-		    updateListModel(dlm);
-		}
-	    }
-	});
-	JButton deleteButton = new JButton(GDLEditorImageUtil.DELETE_ICON);
-	deleteButton.setContentAreaFilled(false);
-	deleteButton.setPreferredSize(new Dimension(16,16));
-	deleteButton.setBorderPainted(false);
-	deleteButton.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent e) {
-		int index = getJList().getSelectedIndex();
-		if(index>=0){
-		    DefaultListModel dlm = ((DefaultListModel)getJList().getModel());
-		    dlm.removeElementAt(index);
-		    updateListModel(dlm);
-		}
-	    }
-	});
-	buttonPanel.add(addButton);
-	buttonPanel.add(deleteButton);
-	this.add(buttonPanel, BorderLayout.WEST);
-	this.add(getJList(), BorderLayout.CENTER);
+        this.setLayout(new BorderLayout());
+        this.setBorder(BorderFactory.createTitledBorder(_title));
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        JButton addButton = new JButton(GDLEditorImageUtil.ADD_ICON);
+        addButton.setContentAreaFilled(false);
+        addButton.setPreferredSize(new Dimension(16,16));
+        addButton.setBorderPainted(false);
+        addButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String value = JOptionPane.showInputDialog(EditorManager.getActiveEditorWindow(), _title, "");
+                if(value!=null){
+                    DefaultListModel dlm = ((DefaultListModel)getJList().getModel());
+                    dlm.addElement(value);
+                    updateListModel(dlm);
+                }
+            }
+        });
+        JButton deleteButton = new JButton(GDLEditorImageUtil.DELETE_ICON);
+        deleteButton.setContentAreaFilled(false);
+        deleteButton.setPreferredSize(new Dimension(16,16));
+        deleteButton.setBorderPainted(false);
+        deleteButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int index = getJList().getSelectedIndex();
+                if(index>=0){
+                    DefaultListModel dlm = ((DefaultListModel)getJList().getModel());
+                    dlm.removeElementAt(index);
+                    updateListModel(dlm);
+                }
+            }
+        });
+        buttonPanel.add(addButton);
+        buttonPanel.add(deleteButton);
+        this.add(buttonPanel, BorderLayout.WEST);
+        this.add(getJList(), BorderLayout.CENTER);
     }
 
     private JList getJList(){
-	if(jList==null){
-	    jList = new JList(new DefaultListModel());
-	    jList.setBorder(BorderFactory.createEtchedBorder());
-	}
-	return jList;
+        if(jList==null){
+            jList = new JList(new DefaultListModel());
+            jList.setBorder(BorderFactory.createEtchedBorder());
+        }
+        return jList;
     }
 
     private void updateListModel(DefaultListModel dlm){
-	List<String> elements = new ArrayList<String>();
-	for (int i=0; i<dlm.getSize(); i++) {
-	    elements.add((String)dlm.getElementAt(i));
-	}
-	_context.setValue(_xPath, elements);
+        List<String> elements = new ArrayList<String>();
+        for (int i=0; i<dlm.getSize(); i++) {
+            String value = (String)dlm.getElementAt(i);
+            if (value!=null){
+                value = value.replace("\"","\\\"");
+            }
+            elements.add(value);
+        }
+        _context.setValue(_xPath, elements);
     }
 }
 /*

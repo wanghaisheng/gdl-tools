@@ -22,11 +22,11 @@ public enum OperatorKind {
 	 * Relational operators
 	 */
 	EQUALITY("equal", "=="),
-	INEQUAL("inequal", "!="),
+    INEQUAL("unequal", "!="),
 	LESS_THAN("less than", "<"),
-	LESS_THAN_OR_EQUAL("less than or equal", "<="),
+	LESS_THAN_OR_EQUAL("less than or equals", "<="),
 	GREATER_THAN("greater than", ">"),
-	GREATER_THAN_OR_EQUAL("greater than or equal", ">="),
+	GREATER_THAN_OR_EQUAL("greater than or equals", ">="),
 	
 	/** 
 	 * Assignment operator
@@ -42,7 +42,9 @@ public enum OperatorKind {
 	/**
 	 * Conditional operators
 	 */
-	FOR_ALL("for all","for_all");
+	FOR_ALL("for all","for_all"),
+    MAX("max","max"),
+    MIN("min","min");
 	
 	private OperatorKind(String name, String symbol) {
 		this.name = name;

@@ -1,4 +1,4 @@
 gdl-tools
 =========
 
-Guideline Description Language tools
+Guideline Definition Language tools

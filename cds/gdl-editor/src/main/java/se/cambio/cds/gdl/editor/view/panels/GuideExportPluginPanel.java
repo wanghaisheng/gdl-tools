@@ -1,21 +1,19 @@
 package se.cambio.cds.gdl.editor.view.panels;
 
-import java.awt.BorderLayout;
-
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
-
 import se.cambio.cds.gdl.editor.controller.GDLEditor;
 import se.cambio.cds.gdl.editor.controller.exportplugins.GuideExportPlugin;
 import se.cambio.cds.gdl.editor.view.panels.interfaces.RefreshablePanel;
 import se.cambio.cds.gdl.model.Guide;
+import se.cambio.openehr.util.ExceptionHandler;
+import se.cambio.openehr.util.exceptions.InternalErrorException;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class GuideExportPluginPanel extends JPanel implements RefreshablePanel{
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
     private GuideExportPlugin _exportPlugin = null;
@@ -23,49 +21,55 @@ public class GuideExportPluginPanel extends JPanel implements RefreshablePanel{
     private JTextArea textArea;
     private GDLEditor _controller = null;
     public GuideExportPluginPanel(GDLEditor controller, GuideExportPlugin exportPlugin){
-	_exportPlugin = exportPlugin;
-	_controller = controller;
-	init();
+        _exportPlugin = exportPlugin;
+        _controller = controller;
+        init();
     }
 
     public void init(){
-	this.setLayout(new BorderLayout());
-	refresh();
+        this.setLayout(new BorderLayout());
+        refresh();
     }
 
     private JScrollPane getMainScrollPanel(){
-	if (mainScrollPanel==null){
-	    mainScrollPanel = new JScrollPane();
-	    mainScrollPanel.setViewportView(getTextArea());
-	}
-	return mainScrollPanel;
+        if (mainScrollPanel==null){
+            mainScrollPanel = new JScrollPane();
+            mainScrollPanel.setViewportView(getTextArea());
+        }
+        return mainScrollPanel;
     }
 
     private JTextArea getTextArea(){
-	if (textArea==null){
-	    textArea = new JTextArea();
-	    Guide guide = _controller.getGuide();
-	    if (guide!=null){
-		textArea.setText(_exportPlugin.getExportedGuide(guide));
-	    }
-	    textArea.setEditable(false);
-	}
-	return textArea;
+        if (textArea==null){
+            textArea = new JTextArea();
+            Guide guide = _controller.getGuide();
+            if (guide!=null){
+                try {
+                    textArea.setText(_exportPlugin.getExportedGuide(guide));
+                } catch (InternalErrorException e) {
+                    ExceptionHandler.handle(e);
+                }
+            }
+            textArea.setEditable(false);
+        }
+        return textArea;
     }
 
     public void refresh(){
-	if (mainScrollPanel!=null){
-	    remove(mainScrollPanel);
-	    mainScrollPanel = null;
-	    textArea = null;
-	}
-	this.add(getMainScrollPanel());
-	SwingUtilities.invokeLater(new Runnable() {
-	    @Override
-	    public void run() {
-		getMainScrollPanel().getVerticalScrollBar().setValue(0);
-	    }
-	});
+        if (mainScrollPanel!=null){
+            remove(mainScrollPanel);
+            mainScrollPanel = null;
+            textArea = null;
+        }
+        this.add(getMainScrollPanel());
+        this.revalidate();
+        this.repaint();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                getMainScrollPanel().getVerticalScrollBar().setValue(0);
+            }
+        });
     }
 }
 /*

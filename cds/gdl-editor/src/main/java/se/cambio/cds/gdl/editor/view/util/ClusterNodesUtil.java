@@ -1,80 +1,96 @@
 package se.cambio.cds.gdl.editor.view.util;
 
-import java.util.Map;
-
 import se.cambio.cds.gdl.editor.util.GDLEditorImageUtil;
-import se.cambio.cds.openehr.model.cluster.vo.ClusterVO;
-import se.cambio.cds.openehr.util.OpenEHRConst;
-import se.cambio.cds.openehr.view.applicationobjects.Clusters;
-import se.cambio.cds.openehr.view.trees.SelectableNode;
-import se.cambio.cds.openehr.view.trees.SelectableNodeWithIcon;
-import se.cambio.cds.util.handlers.ExceptionHandler;
+import se.cambio.openehr.controller.session.data.Clusters;
+import se.cambio.openehr.model.archetype.vo.ClusterVO;
+import se.cambio.openehr.util.ExceptionHandler;
+import se.cambio.openehr.util.OpenEHRConst;
+import se.cambio.openehr.util.OpenEHRConstUI;
+import se.cambio.openehr.view.trees.SelectableNode;
+import se.cambio.openehr.view.trees.SelectableNodeWithIcon;
+
+import java.util.Map;
 
 public class ClusterNodesUtil {
 
-    public static SelectableNode<Object> getClusterNode(String idTemplate, String idCluster, SelectableNode<Object> rootNode, Map<Object, SelectableNode<Object>> clusters){
-	if (idCluster!=null && !idCluster.endsWith("/")){
-	    SelectableNode<Object> clusterNode = clusters.get(idCluster);
-	    if(clusterNode==null){
-		ClusterVO clusterVO = Clusters.getClusterVO(idTemplate, idCluster);
-		if (clusterVO!=null){
-		    SelectableNode<Object> parentNode = 
-			    getClusterNode(idTemplate, clusterVO.getIdParent(), rootNode, clusters);
-		    clusterNode = createClusterNode(clusterVO, null);
-		    clusters.put(idCluster, clusterNode);
-		    parentNode.add(clusterNode);
-		}else{
-		    ExceptionHandler.handle(new Exception("Cluster id '"+idCluster+"' not found"));
-		    return rootNode;
-		}
-	    }
-	    return clusterNode;
-	}else{
-	    return rootNode;
-	}
+    public static SelectableNode<Object> getClusterNode(
+            String idTemplate, String idCluster,
+            SelectableNode<Object> rootNode,
+            Map<Object, SelectableNode<Object>> clusters,
+            boolean singleSelection,
+            boolean simplifiedTree){
+        if (idCluster!=null && !idCluster.endsWith("/")){
+            ClusterVO clusterVO = Clusters.getClusterVO(idTemplate, idCluster);
+            if (clusterVO!=null){
+                if ((simplifiedTree &&
+                        !OpenEHRConst.SECTION.equals(clusterVO.getRMType()) &&
+                        !OpenEHRConst.CLUSTER.equals(clusterVO.getRMType()))){
+                    //Skip node
+                    return getClusterNode(idTemplate, clusterVO.getIdParent(),
+                            rootNode, clusters, singleSelection, simplifiedTree);
+                }
+            }else{
+                ExceptionHandler.handle(new Exception("Cluster id '" + idCluster + "' not found"));
+                return rootNode;
+            }
+            SelectableNode<Object> clusterNode = clusters.get(idCluster);
+            if(clusterNode==null){
+
+                SelectableNode<Object> parentNode =
+                        getClusterNode(idTemplate, clusterVO.getIdParent(),
+                                rootNode, clusters, singleSelection, simplifiedTree);
+                clusterNode = createClusterNode(clusterVO, null, singleSelection);
+                clusters.put(idCluster, clusterNode);
+                parentNode.add(clusterNode);
+
+            }
+            return clusterNode;
+        } else{
+            return rootNode;
+        }
     }
 
     public static SelectableNode<Object> getRMNode(
-	    SelectableNode<Object> rootNode, 
-	    Map<String, SelectableNode<Object>> rmNodes, 
-	    String path){
-	String idRMClassifier = getIdRMClassifier(path);
-	if (idRMClassifier.contains("/")){
-	    rootNode = getRMNode(rootNode, rmNodes, "/"+idRMClassifier.substring(0, idRMClassifier.lastIndexOf("/")));
-	    idRMClassifier = idRMClassifier.substring(idRMClassifier.lastIndexOf("/")+1, idRMClassifier.length());
-	}
-	SelectableNode<Object> rmNode = rmNodes.get(idRMClassifier);
-	if (rmNode==null){
-	    rmNode = new SelectableNodeWithIcon<Object>(
-		    idRMClassifier, null, true, false, 
-		    GDLEditorImageUtil.OBJECT_ICON);
-	    rmNodes.put(idRMClassifier, rmNode);
-	    rootNode.add(rmNode);
-	}
-	return rmNode;
+            SelectableNode <Object> rootNode,
+            Map<String, SelectableNode<Object>> rmNodes,
+            String path){
+        String idRMClassifier = getIdRMClassifier(path);
+        if (idRMClassifier.contains("/")){
+            rootNode = getRMNode(rootNode, rmNodes, "/"+idRMClassifier.substring(0, idRMClassifier.lastIndexOf("/")));
+            idRMClassifier = idRMClassifier.substring(idRMClassifier.lastIndexOf("/")+1, idRMClassifier.length());
+        }
+        SelectableNode<Object> rmNode = rmNodes.get(idRMClassifier);
+        if (rmNode==null){
+            rmNode = new SelectableNodeWithIcon<Object>(
+                    idRMClassifier, null, true, false,
+                    GDLEditorImageUtil.OBJECT_ICON);
+            rmNodes.put(idRMClassifier, rmNode);
+            rootNode.add(rmNode);
+        }
+        return rmNode;
     }
 
     public static String getIdRMClassifier(String path){
-	int index = path.indexOf("[", 1);
-	if (index>0){
-	    return path.substring(1, index);
-	}else{
-	    index = path.indexOf("/", 1);
-	    if (index>0){
-		return path.substring(1, index);
-	    }else{
-		return path.substring(1, path.length());
-	    }
-	}
+        int index = path.indexOf("[", 1);
+        if (index>0){
+            return path.substring(1, index);
+        }else{
+            index = path.indexOf("/", 1);
+            if (index>0){
+                return path.substring(1, index);
+            }else{
+                return path.substring(1, path.length());
+            }
+        }
     }
 
-    public static SelectableNode<Object> createClusterNode(ClusterVO clusterVO, Object object){
-	String upperNumOcurrences = 
-		(clusterVO.getUpperCardinality()==null?" [*]":clusterVO.getUpperCardinality()>1?" ["+clusterVO.getUpperCardinality()+"]":""); 
-	return new SelectableNodeWithIcon<Object>(
-		clusterVO.getName()+upperNumOcurrences, object ,true, false, 
-		OpenEHRConst.getIcon(clusterVO.getRMType()),
-		clusterVO.getDescription());
+    public static SelectableNode<Object> createClusterNode(ClusterVO clusterVO, Object object, boolean singleSelection){
+        String upperNumOcurrences =
+                (clusterVO.getUpperCardinality()==null?" [*]":clusterVO.getUpperCardinality()>1?" ["+clusterVO.getUpperCardinality()+"]":"");
+        return new SelectableNodeWithIcon<Object>(
+                clusterVO.getName()+upperNumOcurrences, object ,singleSelection, false,
+                OpenEHRConstUI.getIcon(clusterVO.getRMType()),
+                clusterVO.getDescription());
     }
 }
 /*

@@ -1,26 +1,37 @@
 package se.cambio.cds.gdl.editor.view;
 
 
-import java.io.File;
-
 import se.cambio.cds.gdl.editor.controller.EditorManager;
 import se.cambio.cds.gdl.editor.controller.sw.LoadEditorSW;
 import se.cambio.cds.gdl.editor.controller.sw.LoadGuideFromFileRSW;
 import se.cambio.cds.gdl.editor.view.dialog.DialogSplash;
 import se.cambio.cds.gdl.editor.view.frame.GDLEditorFrame;
+import se.cambio.cds.model.facade.execution.delegate.RuleExecutionFacadeDelegateFactory;
+import se.cambio.openehr.util.ExceptionHandler;
+import se.cambio.openehr.util.WindowManager;
+import se.cambio.openehr.util.exceptions.InternalErrorException;
+import se.cambio.openehr.view.dialogs.InfoDialog;
+
+import java.io.File;
 
 public class InitGDLEditor {
 
     public static void main(String[] args) {
-	GDLEditorFrame ef = EditorManager.createEditorFrame();
-	DialogSplash dialog = new DialogSplash(ef, true);
-	new LoadEditorSW(dialog).execute();
-	dialog.setVisible(true);
-	
-	if (args.length>0){
-	    //Try to open the GDL File
-	    new LoadGuideFromFileRSW(new File(args[0])).execute();
-	}
+        GDLEditorFrame ef = EditorManager.createEditorFrame();
+        DialogSplash dialog = new DialogSplash(ef, true);
+        WindowManager.registerMainWindow(ef);
+        WindowManager.registerProgressManager(new InfoDialog(ef));
+        new LoadEditorSW(dialog).execute();
+        dialog.setVisible(true);
+        if (args.length>0){
+            //Try to open the GDL File
+            new LoadGuideFromFileRSW(new File(args[0])).execute();
+        }
+        try {
+            RuleExecutionFacadeDelegateFactory.getDelegate().setUseCache(false);
+        } catch (InternalErrorException e) {
+            ExceptionHandler.handle(e);
+        }
     }
 }
 /*

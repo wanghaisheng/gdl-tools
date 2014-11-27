@@ -1,54 +1,70 @@
 package se.cambio.cds.model.guide.dto;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class GuideDTO implements Serializable{
 
     private static final long serialVersionUID = 20120412L;
     private String idGuide;
-    private String name;
-    private String description;
     private String guideSrc;
+    private byte[] guideObject;
     private byte[] compiledGuide;
+    private boolean active;
+    private Date lastUpdate;
 
-    public GuideDTO(String idGuide, String name, String description, String guideSrc, byte[] compiledGuide) {
-	super();
-	this.idGuide = idGuide;
-	this.name = name;
-	this.description = description;
-	this.guideSrc = guideSrc;
-	this.compiledGuide = compiledGuide;
+    public GuideDTO(String idGuide, String guideSrc, byte[] guideObject, byte[] compiledGuide, boolean active, Date lastUpdate) {
+        super();
+        this.idGuide = idGuide;
+        this.guideSrc = guideSrc;
+        this.guideObject = guideObject;
+        this.compiledGuide = compiledGuide;
+        this.active = active;
+        this.lastUpdate = lastUpdate;
     }
     public String getIdGuide() {
-	return idGuide;
+        return idGuide;
     }
     public void setIdGuide(String idGuide) {
-	this.idGuide = idGuide;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public String getDescription() {
-        return description;
-    }
-    public void setDescription(String description) {
-        this.description = description;
+        this.idGuide = idGuide;
     }
     public String getGuideSrc() {
-	return guideSrc;
+        return guideSrc;
     }
     public void setGuideSrc(String guideSrc) {
-	this.guideSrc = guideSrc;
+        this.guideSrc = guideSrc;
+    }
+    public byte[] getGuideObject() {
+        return guideObject;
+    }
+    public void setGuideObject(byte[] guideObject) {
+        this.guideObject = guideObject;
     }
     public byte[] getCompiledGuide() {
-	return compiledGuide;
+        return compiledGuide;
     }
     public void setCompiledGuide(byte[] compiledGuide) {
-	this.compiledGuide = compiledGuide;
+        this.compiledGuide = compiledGuide;
     }
+    public boolean isActive() {
+        return active;
+    }
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
+    /*
+    public int hashCode() {
+        return (guideSrc!=null?guideSrc.hashCode():0)+(guideObject!=null?guideObject.hashCode():2)+(compiledGuide!=null?compiledGuide.hashCode():3)+(active?1:0);
+    }
+    */
 }
 /*
  *  ***** BEGIN LICENSE BLOCK *****
